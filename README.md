@@ -1,11 +1,20 @@
-Scala IDE
----------
+# Scala IDE
 
-Teamproject.
+_Requirements_:
+
+  * [Typesafe Stack](http://typesafe.com/stack/download)
+  * [Play Framework](http://www.playframework.org/documentation/2.0/Installing)
+
+_Run it_:
+
+`git clone git@github.com:themerius/ScalaIde.git`
+
+`cd ScalaIde`
+
+`play run`
 
 
-Technologies
-------------
+# Technologies
 
 * Scala
 * Play Framework
