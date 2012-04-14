@@ -1,0 +1,49 @@
+@(title: String, content: String)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="shortcut icon" type="image/png"
+              href="@routes.Assets.at("images/favicon.png")">
+        <style type="text/css" media="screen">
+          body {
+              overflow: hidden;
+          }
+
+          #editor { 
+              margin: 0;
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+          }
+        </style>
+    </head>
+    <body>
+
+        <pre id="editor">@content</pre>
+
+        <script src="@routes.Assets.at("javascripts/ace/ace.js")"
+                type="text/javascript" charset="utf-8">
+        </script>
+        <script src="@routes.Assets.at("javascripts/ace/theme-pastel_on_dark.js")"
+                type="text/javascript" charset="utf-8">
+        </script>
+        <script src="@routes.Assets.at("javascripts/ace/mode-scala.js")"
+                type="text/javascript" charset="utf-8">
+        </script>
+        <script>
+            window.onload = function() {
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/pastel_on_dark");
+
+            var ScalaMode = require("ace/mode/scala").Mode;
+            editor.getSession().setMode(new ScalaMode());
+            };
+        </script>
+
+    </body>
+</html>
