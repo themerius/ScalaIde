@@ -20,10 +20,11 @@
               left: 0;
               right: 0;
           }
+		  
+
         </style>
     </head>
     <body>
-
         <pre id="editor">@content</pre>
 
         <script src="@routes.Assets.at("javascripts/ace/ace.js")"
@@ -44,6 +45,7 @@
             editor.getSession().setMode(new ScalaMode());
             };
         </script>
+
 
     </body>
 </html>
