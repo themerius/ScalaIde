@@ -45,7 +45,7 @@ object addressbook {
     </head>;
 
   val people = new AddressBook(
-    Person("Tom", 20),
+    Person("Simon", 20),
     Person("Bob", 22),
     Person("James", 19));
 
