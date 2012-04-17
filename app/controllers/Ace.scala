@@ -8,63 +8,44 @@ import play.api.libs.iteratee._
 
 import play.api.libs.concurrent._
 
+
 object Ace extends Controller {
 
+  var out: Enumerator.Pushee[String] = _
+
   def index = Action { implicit request =>
-    val world= """class HelloWorld {
-  def sayHello = "Hello"
-}"""
-    Ok(views.html.ace("Ace", world))
+    Ok(views.html.ace("Ace Editor"))
   }
   
-  def load(fileName : String) = Action { implicit request =>
-	val source = scala.io.Source.fromFile(fileName)
-	val lines = source .mkString
-	source.close ()
-	Ok(views.html.ace("Ace", lines))
+  def load(fileName : String): String = {
+    val source = scala.io.Source.fromFile(fileName)
+    val lines = source.mkString
+    source.close()
+    lines
   }
-  
-  /*def aceSocket = WebSocket.async[JsValue] { request =>
-    
-	    // Just consume and ignore the input
-      val in = Iteratee.foreach[JsValue](x => println(x))
-	  
-	  // Send a single 'Hello!' message and close
-	  val out = Enumerator(JsObject(Seq("text" -> JsString("test"))).as[JsValue])
-	  //val out = Enumerator(JsValue)
-      
-      
-      Promise.pure( (in, out) )
-    
-  }*/
-  
-  	class Message {
-	  var myText:String = ""
-	}
-	
-	object SocketMessage extends Message {
-	  def socketText( msg: String ) = { println(msg) }
-	}
-     
-  
-   def aceSocket = WebSocket.using[String] { request =>
-      
-    // Log events to the console
+
+
+  def aceSocket = WebSocket.using[String] { request =>
+
     val in = Iteratee.foreach[String](this.myMsg).mapDone { _ =>
       println("Disconnected")
     }
 
-    // Send a single 'Hello!' message
-    val out = Enumerator(SocketMessage.myText)
+    val out = Enumerator.pushee[String] { pushee =>
+      pushee.push("The Server welcomes you!")
+      this.out = pushee
+    }
 
     (in, out)
     
-   }
+  }
   
-   def myMsg(msg: String) = msg match { // hier koennte man events ausloesen!
+  def myMsg(msg: String) = msg match { // event ausloesen
 
-     case "bla" => println("You typed bla.")
-     case msg => SocketMessage.socketText( msg )
+    case "bla" => println("You typed bla.")
+    case "bli" => out.push("hahha")
+    case "open addressbook.scala" => out.push(load("addressbook.scala"))
+    case msg => println(msg)
   }
   
 }

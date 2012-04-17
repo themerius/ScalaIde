@@ -1,4 +1,4 @@
-@(title: String, content: String)(implicit request: RequestHeader)
+@(title: String)(implicit request: RequestHeader)
 
 <!DOCTYPE html>
 
@@ -21,7 +21,7 @@
         
     </head>
     <body>
-        <pre id="editor">@content</pre>
+        <pre id="editor"></pre>
 
 
         <script>
@@ -29,8 +29,8 @@
                 window.aceEditor = ace.edit("editor");
                 window.aceEditor.setTheme("ace/theme/pastel_on_dark");
            
-            	var ScalaMode = require("ace/mode/scala").Mode;
-            	window.aceEditor.getSession().setMode(new ScalaMode());
+                var ScalaMode = require("ace/mode/scala").Mode;
+                window.aceEditor.getSession().setMode(new ScalaMode());
             };
             
             $(function() {
@@ -45,8 +45,8 @@
 
                 }
                 
-                var handleReturnKey = function(e) {
-                    if(e.charCode == 13 || e.keyCode == 13) {
+                var handleKey = function(e) {
+                    if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to save
                         e.preventDefault()
                         sendMessage()
                     }
@@ -70,7 +70,7 @@
                     
                 }
                 
-                $("#editor").keypress(handleReturnKey);
+                $("#editor").keypress(handleKey);
                 
                 aceSocket.onmessage = receiveEvent;
             });
