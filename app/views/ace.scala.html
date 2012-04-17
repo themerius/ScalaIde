@@ -1,4 +1,4 @@
-@(title: String, content: String)
+@(title: String, content: String)(implicit request: RequestHeader)
 
 <!DOCTYPE html>
 
@@ -6,46 +6,76 @@
     <head>
         <title>@title</title>
         <link rel="shortcut icon" type="image/png"
-              href="@routes.Assets.at("images/favicon.png")">
-        <style type="text/css" media="screen">
-          body {
-              overflow: hidden;
-          }
-
-          #editor { 
-              margin: 0;
-              position: absolute;
-              top: 0;
-              bottom: 0;
-              left: 0;
-              right: 0;
-          }
-		  
-
-        </style>
+              href="@routes.Assets.at("images/favicon.png")" />
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")" />
+        <script src="@routes.Assets.at("javascripts/ace/ace.js")"
+                type="text/javascript" charset="utf-8" >
+        </script>
+        <script src="@routes.Assets.at("javascripts/ace/theme-pastel_on_dark.js")"
+                type="text/javascript" charset="utf-8" >
+        </script>
+        <script src="@routes.Assets.at("javascripts/ace/mode-scala.js")"
+                type="text/javascript" charset="utf-8" >
+        </script>
+        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        
     </head>
     <body>
         <pre id="editor">@content</pre>
 
-        <script src="@routes.Assets.at("javascripts/ace/ace.js")"
-                type="text/javascript" charset="utf-8">
-        </script>
-        <script src="@routes.Assets.at("javascripts/ace/theme-pastel_on_dark.js")"
-                type="text/javascript" charset="utf-8">
-        </script>
-        <script src="@routes.Assets.at("javascripts/ace/mode-scala.js")"
-                type="text/javascript" charset="utf-8">
-        </script>
+
         <script>
             window.onload = function() {
-            var editor = ace.edit("editor");
-            editor.setTheme("ace/theme/pastel_on_dark");
-
-            var ScalaMode = require("ace/mode/scala").Mode;
-            editor.getSession().setMode(new ScalaMode());
+                window.aceEditor = ace.edit("editor");
+                window.aceEditor.setTheme("ace/theme/pastel_on_dark");
+           
+            	var ScalaMode = require("ace/mode/scala").Mode;
+            	window.aceEditor.getSession().setMode(new ScalaMode());
             };
-        </script>
+            
+            $(function() {
+                var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+                var aceSocket = new WS("@routes.Ace.aceSocket.webSocketURL()")
+                
+                var sendMessage = function() {
+                   /* aceSocket.send(JSON.stringify(
+                        {text: window.aceEditor.getSession().getValue()}
+                    )) */
+                    aceSocket.send(window.aceEditor.getSession().getValue())
 
+                }
+                
+                var handleReturnKey = function(e) {
+                    if(e.charCode == 13 || e.keyCode == 13) {
+                        e.preventDefault()
+                        sendMessage()
+                    }
+                }
+                
+                var receiveEvent = function(event) {
+                    //var data = JSON.parse(event.data)
+                    
+                    // Handle errors
+                    if(event.data.error) {
+                    	chatSocket.close()
+                        //$("#onError span").text(data.error)
+                        //$("#onError").show()
+                        alert("Error");
+                        return
+                    } else {
+                    	window.aceEditor.getSession().setValue(event.data);
+                        //$("#onChat").show()
+                    }
+                    
+                    
+                }
+                
+                $("#editor").keypress(handleReturnKey);
+                
+                aceSocket.onmessage = receiveEvent;
+            });
+
+        </script>
 
     </body>
 </html>

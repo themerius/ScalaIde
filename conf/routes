@@ -6,6 +6,7 @@
 GET     /                           controllers.Application.index
 GET     /ace                        controllers.Ace.index
 GET		/ace/:fileName/load				controllers.Ace.load(fileName : String)
+GET     /aceSocket                  controllers.Ace.aceSocket
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
