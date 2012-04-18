@@ -36,19 +36,32 @@
             $(function() {
                 var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
                 var aceSocket = new WS("@routes.Ace.aceSocket.webSocketURL()")
+
+                var fileName = ""
                 
                 var sendMessage = function() {
                    /* aceSocket.send(JSON.stringify(
                         {text: window.aceEditor.getSession().getValue()}
                     )) */
                     aceSocket.send(window.aceEditor.getSession().getValue())
-
                 }
-                
+
+                var sendMessageSave = function() {
+                   /* aceSocket.send(JSON.stringify(
+                        {text: window.aceEditor.getSession().getValue()}
+                    )) */
+                    aceSocket.send("!"+fileName+"!"+window.aceEditor.getSession().getValue())
+                }
+
                 var handleKey = function(e) {
-                    if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to save
+                    if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to send
                         e.preventDefault()
+                        fileName = window.aceEditor.getSession().getValue()
                         sendMessage()
+                    }
+                    if(e.charCode == 35 || e.keyCode == 35) {  // hit # to save file
+                        e.preventDefault()
+                        sendMessageSave()
                     }
                 }
                 

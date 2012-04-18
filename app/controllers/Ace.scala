@@ -1,5 +1,7 @@
 package controllers
 
+import java.io.{OutputStreamWriter, FileOutputStream}
+
 import play.api._
 import play.api.mvc._
 
@@ -17,13 +19,19 @@ object Ace extends Controller {
     Ok(views.html.ace("Ace Editor"))
   }
   
-  def load(fileName : String): String = {
+  def load(fileName: String): String = {
     val source = scala.io.Source.fromFile(fileName)
     val lines = source.mkString
     source.close()
     lines
   }
 
+  def save(fileName: String, content: String) = {
+    val out = new OutputStreamWriter(
+      new FileOutputStream(fileName), "UTF-8")
+    out.write(content)
+    out.close
+  }
 
   def aceSocket = WebSocket.using[String] { request =>
 
@@ -32,20 +40,21 @@ object Ace extends Controller {
     }
 
     val out = Enumerator.pushee[String] { pushee =>
-      pushee.push("The Server welcomes you!")
+      pushee.push("The Server welcomes you!\n" +
+                  "addressbook.scala$   ===> load the file\n" +
+                  "edit the file and safe it with the # key.")
       this.out = pushee
     }
 
     (in, out)
     
   }
-  
-  def myMsg(msg: String) = msg match { // event ausloesen
 
+  def myMsg(msg: String) = msg match { // event ausloesen
     case "bla" => println("You typed bla.")
     case "bli" => out.push("hahha")
-    case "open addressbook.scala" => out.push(load("addressbook.scala"))
-    case msg => println(msg)
+    case msg if msg.endsWith("scala") => out.push( load(msg) )
+    case msg => save( msg.split('!')(1), msg.split('!')(2) )
   }
-  
+
 }
