@@ -1,0 +1,23 @@
+@(implicit request: RequestHeader)
+
+<script src="@routes.Assets.at("javascripts/editor.js")" type="text/javascript"></script>
+
+<div id="editor"></div>
+
+<script type="text/javascript">
+	jQuery(document).ready(function(){
+
+		window.aceEditor = ace.edit("editor");
+    	window.aceEditor.setTheme("ace/theme/pastel_on_dark");
+  
+    	var ScalaMode = require("ace/mode/scala").Mode;
+       	window.aceEditor.getSession().setMode(new ScalaMode());
+
+        var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
+        
+        IDE.htwg.editor = new IDE.htwg.Editor(jQuery);
+        IDE.htwg.editor._aceSocket = new WS("@routes.Application.aceSocket.webSocketURL()");
+        IDE.htwg.editor._aceSocket.onmessage = IDE.htwg.editor.receiveEvent;
+ 	});
+</script>
+

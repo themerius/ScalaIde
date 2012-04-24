@@ -1,7 +1,13 @@
-@(message: String)
+@(title: String)(implicit request: RequestHeader)
 
-@main("Welcome to Play 2.0") {
+@import header._
+@import includes._
+
+@main(title) {
     
-    @play20.welcome(message)
-    
+        @includes.browser()
+ 
+ 		@includes.editor(request)
+ 		
+ 		@includes.terminal()
 }
