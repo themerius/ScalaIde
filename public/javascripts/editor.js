@@ -25,6 +25,15 @@ IDE.htwg.Editor = function($){
     this._aceSocket = false;
     
     /**
+    * Scope duplicator / parent this
+    *
+    * @var
+    * @access private
+    * @type object
+    */
+    var that = this;
+    
+    /**
     * Constructor
     *
     * Initializes the editor
@@ -64,11 +73,11 @@ IDE.htwg.Editor = function($){
         if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to send
             e.preventDefault();
             this._fileName = window.aceEditor.getSession().getValue();
-            this.sendMessage();
+            that.sendMessage();
         }
         if(e.charCode == 35 || e.keyCode == 35) {  // hit # to save file
             e.preventDefault();
-            this.sendMessageSave();
+            that.sendMessageSave();
         }
     };
         
