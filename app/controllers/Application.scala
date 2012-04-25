@@ -1,6 +1,6 @@
 package controllers
 
-import java.io.{OutputStreamWriter, FileOutputStream}
+import java.io.{OutputStreamWriter, FileOutputStream, File}
 
 import play.api._
 import play.api.mvc._
@@ -11,12 +11,15 @@ import play.api.libs.iteratee._
 import play.api.libs.concurrent._
 
 
+
+
 object Application extends Controller {
 
   var out: Enumerator.Pushee[String] = _
 
   def index = Action { implicit request =>
-    Ok(views.html.index("Ace Editor"))
+    Ok(views.html.index("Ace Editor", recursiveListFiles(new File(".")).filter(f => """.*\.scala$""".r.findFirstIn(f.getName).isDefined)
+))
   }
   
   def load(fileName: String): String = {
@@ -32,7 +35,13 @@ object Application extends Controller {
     out.write(content)
     out.close
   }
+  
+  def recursiveListFiles(f: File): Array[File] = {
+    val these = f.listFiles
+    these
+  }
 
+  
   def aceSocket = WebSocket.using[String] { request =>
 
     val in = Iteratee.foreach[String](this.myMsg).mapDone { _ =>

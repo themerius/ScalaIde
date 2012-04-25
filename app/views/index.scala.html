@@ -1,11 +1,11 @@
-@(title: String)(implicit request: RequestHeader)
+@(title: String, fileList: Array[java.io.File])(implicit request: RequestHeader)
 
 @import header._
 @import includes._
 
 @main(title) {
     
-        @includes.browser()
+        @includes.browser(fileList)
  
  		@includes.editor(request)
  		
