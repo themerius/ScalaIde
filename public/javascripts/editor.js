@@ -43,7 +43,7 @@ IDE.htwg.Editor = function($){
     * @return void
     */
     this.init = function ( options ) {
-    	$("#editor").keypress(this.handleKey);
+    	$("#editor").keyup(this.handleKey);
     };
     
     /**
@@ -57,7 +57,7 @@ IDE.htwg.Editor = function($){
         
     	
     this.sendMessage = function( msg ) {
-    	if ( msg.file ){
+    	if ( msg.file && !msg.folder ){
     		this._fileName = msg.file;
     	}
     	this._webSocket.send( JSON.stringify( msg ) );

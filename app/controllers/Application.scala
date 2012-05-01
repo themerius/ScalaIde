@@ -41,31 +41,16 @@ object Application extends Controller {
     out.close
   }
   
+  def rename(fileName: String, newFileName: String) = {
+  	val src = new File(fileName)
+    val dest = new File(newFileName) 
+    src.renameTo(dest);  
+  }
+  
   def recursiveListFiles(f: File): Array[File] = {
     val these = f.listFiles
     these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
-
-
-
-
-  
-  /*def webSocket = WebSocket.using[String] { request =>
-
-    val in = Iteratee.foreach[String](this.command).mapDone { _ =>
-      println("Disconnected")
-    }
-
-    val out = Enumerator.pushee[String] { pushee =>
-      pushee.push("The Server welcomes you!\n" +
-                  "addressbook.scala$   ===> load the file\n" +
-                  "edit the file and safe it with the # key.")
-      this.out = pushee
-    }
-
-    (in, out)
-    
-  }*/
   
   def webSocket = WebSocket.async[JsValue] { request =>
 
@@ -82,22 +67,7 @@ object Application extends Controller {
 
   /*****
    * 
-   * TODO: 1. JSON Commands von Frontend zu Backend:
-   *    WebSocket.async[JsValue] { request => ...
-    
-	    Iteratee.foreach[JsValue]....
-	  
-	    JSON Objekt generieren: JsObject(Seq("text" -> JsString("test"))).as[JsValue]
-   * 
-   *    Beispiel:
-   *    var jsonExample = {
-   *       command: "save",
-   *       file: "filename",
-   *       content: "filecontent"
-   *    }
-   * 
-   * 
-   * 2. Mapping in eine model class auslagern
+   * TODO 1. Mapping in eine model class auslagern
    * 
    */
   
@@ -112,6 +82,13 @@ object Application extends Controller {
 	  		case "save" => {
 	  		  val value = (msg \ "value").as[String]
 	  		  save(fileName, value)
+	  		}
+	  		case "rename" => {
+	  			val oldFileName = (msg \ "value").as[String]
+	  			val folder = (msg \ "folder").as[Boolean]
+	  			rename( oldFileName, fileName )
+	  			if ( !folder )
+	  		    out.push(load( fileName ))
 	  		}
 	  		case "" => out.push(loadError)
 	  }

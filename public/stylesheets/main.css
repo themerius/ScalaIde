@@ -42,3 +42,8 @@ body {
 	border:1px solid #99CCFF;
 	color: #000;
 }
+
+#vakata-contextmenu{
+	font-family: Verdana;
+	font-size: 11px;
+}
