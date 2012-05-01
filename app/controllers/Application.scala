@@ -109,6 +109,10 @@ object Application extends Controller {
 	 
 	  command match {
 	  		case "load" => out.push(load( fileName ))
+	  		case "save" => {
+	  		  val value = (msg \ "value").as[String]
+	  		  save(fileName, value)
+	  		}
 	  		case "" => out.push(loadError)
 	  }
 	 

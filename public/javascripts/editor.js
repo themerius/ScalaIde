@@ -57,15 +57,24 @@ IDE.htwg.Editor = function($){
         
     	
     this.sendMessage = function( msg ) {
+    	if ( msg.file ){
+    		this._fileName = msg.file;
+    	}
     	this._webSocket.send( JSON.stringify( msg ) );
     };
 
     this.handleKey = function(e) {
-        if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to send
-            e.preventDefault();
-            this._fileName = window.aceEditor.getSession().getValue();
-            that.sendMessage();
-        }
+        //if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to send
+    	
+    	//every key press saves the document, like google doc
+            //e.preventDefault();
+            var msg = {
+            		"command": "save",
+            		"file": that._fileName,
+            		"value": window.aceEditor.getSession().getValue()
+            };
+            that.sendMessage( msg );
+        //}
     };
         
     this.receiveEvent = function(event) {
