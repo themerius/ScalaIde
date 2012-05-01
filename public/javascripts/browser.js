@@ -34,11 +34,7 @@ IDE.htwg.Browser = function($){
     */
     var that = this;
 	
-	// TODO: 1. js auslagern CHECK
-    //       2. bindings erweitern,
-    //       3. statt per ajax alles an den websocket schicken
-    //       4. befehle in scala mappen
-    //       5. befehle in scala implementieren -> - file/ordner name ändern,
+	// TODO: 1. befehle in scala implementieren -> - file/ordner name ändern,
     //                                             - file/ordner anlegen,
     //                                             - file/ordner löschen,  
 	
@@ -89,18 +85,15 @@ IDE.htwg.Browser = function($){
 				})
 		
 				.bind("select_node.jstree", function (event, data) {
-					     if ( data.rslt.obj.attr("rel") === "file" ){
-					    	 //IDE.htwg.editor._fileName = data.rslt.obj.attr("target");
-					    	 
-					    	 var msg = {
-					    			 "command" : "load",
-					    			 "file": data.rslt.obj.attr("target")					    			 
-					    	 };
-					    	 
-					    	 IDE.htwg.editor.sendMessage( msg );
-					     }
-					     
-					     console.log(data);
+				     if ( data.rslt.obj.attr("rel") === "file" ){
+				    	 
+				    	 var msg = {
+				    			 "command" : "load",
+				    			 "file": data.rslt.obj.attr("target")					    			 
+				    	 };
+				    	 
+				    	 IDE.htwg.editor.sendMessage( msg );
+				     }
 				}); 
 
     };
