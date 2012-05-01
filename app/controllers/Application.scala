@@ -113,6 +113,10 @@ object Application extends Controller {
 	  		  val value = (msg \ "value").as[String]
 	  		  save(fileName, value)
 	  		}
+        case "terminal:command" => {
+          val cmd = (msg \ "value").as[String]
+          out.push( Terminal.sendCommand(cmd) )
+        }
 	  		case "" => out.push(loadError)
 	  }
 	 
