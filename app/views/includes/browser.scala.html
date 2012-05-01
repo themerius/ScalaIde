@@ -1,39 +1,19 @@
-@(fileList: Array[java.io.File])
+@(root: java.io.File)
+
+@import includes.filelist
 
 <script src="@routes.Assets.at("javascripts/browser.js")" type="text/javascript"></script>
 
 <div style="width:300px; height:100%; float:left;" id="browser">
-
 	<ul>
-		@for(file <- fileList) {
-		    <li id="phtml_2">
-		  		<a href="#">@file</a>
-		  	</li>
-		} 
+		@filelist(root, true)
 	</ul>
-
-
-	@*  TODO: Liste aus Scala generieren über "at (browser: List)" 
-	<ul>
-		<li id="phtml_1">
-			<a href="#">Root node 1</a>
-			<ul>
-				<li id="phtml_2">
-					<a href="#">Child node 1</a>
-				</li>
-				<li id="phtml_3">
-					<a href="#">Child node 2</a>
-				</li>
-			</ul>
-		</li>
-		<li id="phtml_4">
-			<a href="#">Root node 2</a>
-		</li>
-	</ul>*@
 </div>
 
 <script type="text/javascript">
 	jQuery(document).ready(function(){
 		IDE.htwg.browser = new IDE.htwg.Browser( jQuery );
+		IDE.htwg.browser._webSocket = window.webSocket;
+        IDE.htwg.browser._webSocket.onmessage = IDE.htwg.browser.receiveEvent;
 	});
 </script>

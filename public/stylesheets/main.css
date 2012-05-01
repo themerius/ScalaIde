@@ -31,3 +31,14 @@ body {
     color: #8F938F;
 	
 }
+
+#browser{
+	font-family: Verdana;
+	font-size: 12px;
+}
+
+#browser.jstree-classic .jstree-clicked {
+	background: #99CCFF;
+	border:1px solid #99CCFF;
+	color: #000;
+}

@@ -11,23 +11,28 @@ import play.api.libs.iteratee._
 import play.api.libs.concurrent._
 
 
-
-
 object Application extends Controller {
 
-  var out: Enumerator.Pushee[String] = _
-
+  var out: Enumerator.Pushee[JsValue] = _
+  
   def index = Action { implicit request =>
-    Ok(views.html.index("Ace Editor", recursiveListFiles(new File(".")).filter(f => """.*\.scala$""".r.findFirstIn(f.getName).isDefined)
-))
+    Ok(views.html.index("Ace Editor", new File("projectspace")))
   }
   
-  def load(fileName: String): String = {
+  def load(fileName: String): JsValue = {
     val source = scala.io.Source.fromFile(fileName)
     val lines = source.mkString
     source.close()
-    lines
+    
+    JsObject(Seq("command" -> JsString("load"),
+    			 "text" -> JsString(lines))).as[JsValue];
+    
   }
+  
+  def loadError = JsObject(Seq("command" -> JsString("error"),
+		  					   "error" -> JsString("true"),
+    						   "text" -> JsString("Something went wrong while loading!"))).as[JsValue];
+    
 
   def save(fileName: String, content: String) = {
     val out = new OutputStreamWriter(
@@ -38,13 +43,16 @@ object Application extends Controller {
   
   def recursiveListFiles(f: File): Array[File] = {
     val these = f.listFiles
-    these
+    these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
 
-  
-  def aceSocket = WebSocket.using[String] { request =>
 
-    val in = Iteratee.foreach[String](this.myMsg).mapDone { _ =>
+
+
+  
+  /*def webSocket = WebSocket.using[String] { request =>
+
+    val in = Iteratee.foreach[String](this.command).mapDone { _ =>
       println("Disconnected")
     }
 
@@ -57,6 +65,19 @@ object Application extends Controller {
 
     (in, out)
     
+  }*/
+  
+  def webSocket = WebSocket.async[JsValue] { request =>
+
+    val in = Iteratee.foreach[JsValue](this.commandHandling)
+
+    val out = Enumerator.pushee[JsValue] {
+    	pushee => pushee.push(JsObject(Seq("command" -> JsString("load"),
+    								 "text" -> JsString("Happy Coding!"))).as[JsValue])
+    	this.out = pushee
+    }
+
+    Promise.pure((in,out)) 
   }
 
   /*****
@@ -80,11 +101,17 @@ object Application extends Controller {
    * 
    */
   
-  def myMsg(msg: String) = msg match { // event ausloesen
-    case "bla" => println("You typed bla.")
-    case "bli" => out.push("hahha")
-    case msg if msg.endsWith("scala") => out.push( load(msg) )
-    case msg => save( msg.split('!')(1), msg.split('!')(2) )
+  def commandHandling(msg: JsValue) = {
+    
+      //TODO: ERROR when js key not exists
+	  val command = (msg \ "command").as[String]
+	  val fileName = (msg \ "file").as[String]
+	 
+	  command match {
+	  		case "load" => out.push(load( fileName ))
+	  		case "" => out.push(loadError)
+	  }
+	 
   }
 
 }

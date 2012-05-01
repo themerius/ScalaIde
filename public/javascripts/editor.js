@@ -3,7 +3,7 @@
 *
 * @author sischnee <sischnee@gmail.com>
 * @since 2012/04/23
-* @license ace common license
+* @license BSD common license
 */
 
 var IDE = IDE || {};
@@ -14,15 +14,16 @@ IDE.htwg.Editor = function($){
     if ( jQuery('#editor').length == 0 ) {
         //no need to initialize
         return false;
-    }        
+    }
+    
     /**
-    * Contains the aceSocket
+    * Contains the webSocket
     *
     * @var
     * @access public
     * @type object
     */
-    this._aceSocket = false;
+    this._webSocket = false;
     
     /**
     * Scope duplicator / parent this
@@ -55,18 +56,8 @@ IDE.htwg.Editor = function($){
     this._fileName = "";
         
     	
-    this.sendMessage = function() {
-       /* aceSocket.send(JSON.stringify(
-            {text: window.aceEditor.getSession().getValue()}
-        )) */
-    	this._aceSocket.send(window.aceEditor.getSession().getValue());
-    };
-
-    this.sendMessageSave = function() {
-           /* aceSocket.send(JSON.stringify(
-                {text: window.aceEditor.getSession().getValue()}
-            )) */
-    	this._aceSocket.send("!"+this._fileName+"!"+window.aceEditor.getSession().getValue());
+    this.sendMessage = function( msg ) {
+    	this._webSocket.send( JSON.stringify( msg ) );
     };
 
     this.handleKey = function(e) {
@@ -75,25 +66,27 @@ IDE.htwg.Editor = function($){
             this._fileName = window.aceEditor.getSession().getValue();
             that.sendMessage();
         }
-        if(e.charCode == 35 || e.keyCode == 35) {  // hit # to save file
-            e.preventDefault();
-            that.sendMessageSave();
-        }
     };
         
     this.receiveEvent = function(event) {
-        //var data = JSON.parse(event.data)
+        var data = JSON.parse(event.data);
 
     	// Handle errors
-        if(event.data.error) {
-        	chatSocket.close();
+        if(data.error) {
             //$("#onError span").text(data.error)
             //$("#onError").show()
             alert("Error");
             return;
         } else {
-        	window.aceEditor.getSession().setValue(event.data);
-            //$("#onChat").show()
+        	
+        	//probably there might be more commands
+        	switch (data.command) {
+        		case "load":
+        			window.aceEditor.getSession().setValue(data.text);
+        			break;
+        		default:
+        	}
+        	
         }        
     };
     

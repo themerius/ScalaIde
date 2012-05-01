@@ -1,0 +1,14 @@
+@(file:java.io.File, root:Boolean)
+
+	@if(file.isDirectory) {
+	  <li @if(root){id="root" rel="root"}else{rel="folder"} title="@file.getPath">
+	    <a href="#">@file.getName</a>
+	    <ul>
+	      @List(file.listFiles : _*).map{ f => @filelist(f, false) }
+	    </ul>
+	  </li>
+	} else {
+	  <li rel="file" target="@file.getPath">
+	    <a href="#">@file.getName</a>
+	  </li>
+	}
