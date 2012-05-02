@@ -5,14 +5,17 @@
 
 @main(title) {
     
-	<script type="text/javascript">
-		jQuery(document).ready(function(){
-	       var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-	       window.webSocket = new WS("@routes.Application.webSocket.webSocketURL()");
-		});
+  <script type="text/javascript">
+    jQuery(document).ready(function(){
+      var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
+	    window.webSocket = new WS("@routes.Application.webSocket.webSocketURL()");
+	    IDE.htwg.websocket = new IDE.htwg.Websocket(jQuery);
+	    IDE.htwg.websocket._websocket = window.webSocket;
+	    IDE.htwg.websocket._websocket.onmessage = IDE.htwg.websocket.receiveEvent;
+	  });
 	</script>
     
-    @includes.browser(root)
+  @includes.browser(root)
 
 	@includes.editor()
 	

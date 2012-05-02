@@ -4,16 +4,13 @@
 
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-
 		window.aceEditor = ace.edit("editor");
-    	window.aceEditor.setTheme("ace/theme/pastel_on_dark");
+    window.aceEditor.setTheme("ace/theme/pastel_on_dark");
   
-    	var ScalaMode = require("ace/mode/scala").Mode;
-       	window.aceEditor.getSession().setMode(new ScalaMode());
+    var ScalaMode = require("ace/mode/scala").Mode;
+    window.aceEditor.getSession().setMode(new ScalaMode());
         
-        IDE.htwg.editor = new IDE.htwg.Editor(jQuery);
-        IDE.htwg.editor._webSocket = window.webSocket;
-        IDE.htwg.editor._webSocket.onmessage = IDE.htwg.editor.receiveEvent;
+    IDE.htwg.editor = new IDE.htwg.Editor(jQuery);
  	});
 </script>
 
