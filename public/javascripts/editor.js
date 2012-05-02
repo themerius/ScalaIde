@@ -10,48 +10,44 @@ var IDE = IDE || {};
 IDE.htwg = IDE.htwg || {};
 
 IDE.htwg.Editor = function($){
-		
-    if ( jQuery('#editor').length == 0 ) {
-        //no need to initialize
-        return false;
-    }
-    
-    /**
-    * Constructor
-    *
-    * Initializes the editor
-    *
-    * @access public
-    * @return void
-    */
-    this.init = function() {
-    	$("#editor").keyup(this.handleKey);
-    };
 
-    this.handleKey = function(e) {
-        //if(e.charCode == 36 || e.keyCode == 36) {  // hit $ to send
-    	
-    	//every key press saves the document, like google doc
-            //e.preventDefault();
-            var msg = {
-                "type": "editor",
-            		"command": "save",
-            		"file": IDE.htwg.websocket._fileName,
-            		"value": window.aceEditor.getSession().getValue()
-            };
-            IDE.htwg.websocket.sendMessage( msg );
-        //}
+  if ( jQuery('#editor').length == 0 ) {
+      //no need to initialize
+      return false;
+  }
+
+  /**
+  * Constructor
+  *
+  * Initializes the editor
+  *
+  * @access public
+  * @return void
+  */
+  this.init = function() {
+    $("#editor").keyup(this.handleKey);
+  };
+
+  this.handleKey = function(e) {
+    var msg = {
+      "type": "editor",
+      "command": "save",
+      "file": IDE.htwg.websocket._fileName,
+      "value": window.aceEditor.getSession().getValue()
     };
-    
-    //probably there might be more commands
-    this.executeCommand = function(data){
-      switch ( data.command ){
-        case "load":
-          window.aceEditor.getSession().setValue(data.text);
-          break;
-        default:break;
-      }
-    };
-    
-    this.init();    
+    IDE.htwg.websocket.sendMessage( msg );
+
+  };
+
+  //probably there might be more commands
+  this.executeCommand = function(data){
+    switch ( data.command ){
+      case "load":
+        window.aceEditor.getSession().setValue(data.text);
+        break;
+      default:break;
+    }
+  };
+
+  this.init();    
 };
