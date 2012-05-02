@@ -42,16 +42,15 @@ IDE.htwg.Browser = function($){
 		jQuery("#browser")
 			.jstree({
 				"plugins" : ["themes","html_data", "types", "ui", "contextmenu", "crrm"],
-	
-		        "themes" : {
-		        	"theme" : "classic"
-		        },
-		        "ui" : {
-		        	"select_limit" : 1,
-		        	"select_multiple_modifier" : "alt",
-		        	"selected_parent_close" : "select_parent",
-		        	"initially_select" : [ "root" ]
-		        },
+        "themes" : {
+        	"theme" : "classic"
+        },
+        "ui" : {
+        	"select_limit" : 1,
+        	"select_multiple_modifier" : "alt",
+        	"selected_parent_close" : "select_parent",
+        	"initially_select" : [ "root" ]
+        },
 				"types" : {
 					"valid_children" : [ "drive" ],
 					"types" : {
@@ -74,10 +73,11 @@ IDE.htwg.Browser = function($){
 					}
 				},
 				'contextmenu' : {
-					  'items' : that.customMenu
+				  'items' : that.customMenu
 				},
-	
-				"core" : { "initially_open" : [ "root" ] }
+				"core" : {
+				  "initially_open" : [ "root" ]
+				}
 			})
 	
 			.bind("loaded.jstree", function (event, data) {
@@ -86,15 +86,13 @@ IDE.htwg.Browser = function($){
 			.bind("rename_node.jstree", function (event, data) {
 			  
 			  var regex = /^[a-zA-Z._]*$/;
-			  if (!regex.test(data.rslt.name))
-			  {
+			  if ( !regex.test(data.rslt.name) ){
           alert("Characters not allowed.");
           $.jstree.rollback(data.rlbk);
           return;
 			  }
 			    
 			  if ( data.rslt.obj.attr("rel") === "file" || data.rslt.obj.attr("rel") === "folder" ){
-			    
 			    var lastPositionOfSlash = data.rslt.obj.attr("title").lastIndexOf("\\");
 			    var relativePath = data.rslt.obj.attr("title").substring(0, lastPositionOfSlash);
 			    var newFileName = relativePath + "\\" + data.rslt.name;	    
@@ -128,11 +126,11 @@ IDE.htwg.Browser = function($){
           }
           
           var msg = {
-              "command" : "rename",
-              "file": newFileName,
-              "value": data.rslt.obj.attr("title"),
-              "folder": false
-            };
+            "command": "rename",
+            "file": newFileName,
+            "value": data.rslt.obj.attr("title"),
+            "folder": false
+          };
           
           if ( data.rslt.obj.attr("rel") === "folder" ){
             msg.folder = true;
@@ -144,16 +142,15 @@ IDE.htwg.Browser = function($){
 			})
 	
 			.bind("select_node.jstree", function (event, data) {
-			     if ( data.rslt.obj.attr("rel") === "file" ){
+		    if ( data.rslt.obj.attr("rel") === "file" ){
+		    	var msg = {
+	    		  "command" : "load",
+	    		  "file": data.rslt.obj.attr("title")					    			 
+		   	  };
 			    	 
-			    	 var msg = {
-			    			 "command" : "load",
-			    			 "file": data.rslt.obj.attr("title")					    			 
-				    	 };
-				    	 
-				    	 IDE.htwg.editor.sendMessage( msg );
-				     }
-				}); 
+		      IDE.htwg.editor.sendMessage( msg );
+		    }
+			}); 
 	
 	};
 	
@@ -185,7 +182,6 @@ IDE.htwg.Browser = function($){
       renameItem: {
   		  "label": "Rename",
   		  "action": function (obj) {
-  		    if ( obj.attr("rel") !== "root" )
   		      $("#browser").jstree("rename");
   		    }
       },
@@ -198,12 +194,12 @@ IDE.htwg.Browser = function($){
           that.deleteItem(obj)
         }
       }
-	  };
+	  }
 	
   	if ($(node).attr("rel") === "root") {
-  	    // Delete the "delete" menu item
-  	    delete items.deleteItem;
-  	    delete items.renameItem;
+  	  // Delete the "delete" menu item
+  	  delete items.deleteItem;
+  	  delete items.renameItem;
   	}
 	
 	  return items;
@@ -211,32 +207,16 @@ IDE.htwg.Browser = function($){
 	
 	this.renameItem = function(obj){
 		var msg = {
-			 "command" : "load",
-		 "file": data.rslt.obj.attr("title"),
-		 "value": "test"
-	    };
+	    "command" : "load",
+		  "file": data.rslt.obj.attr("title"),
+		  "value": "test"
+	  };
 		IDE.htwg.editor.sendMessage( msg );
 	}
 	
 	this.deleteItem = function(obj){
 		alert("delete");
 	}
-	
-	this.receiveEvent = function(event) {
-	    //var data = JSON.parse(event.data)
-	
-	// Handle errors
-	if(event.data.error) {
-		chatSocket.close();
-	    //$("#onError span").text(data.error)
-	    //$("#onError").show()
-	    alert("Error");
-	    return;
-	} else {
-		window.aceEditor.getSession().setValue(event.data);
-	    //$("#onChat").show()
-	    }        
-	};
 	
 	this.initialize();
 };
