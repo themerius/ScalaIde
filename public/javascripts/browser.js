@@ -14,16 +14,7 @@ IDE.htwg.Browser = function($){
 	if ( jQuery('#browser').length == 0 ) {
 	//no need to initialize
 	    return false;
-	}   
-	
-	/**
-	 * Contains the webSocket
-	 *
-	 * @var
-	 * @access public
-	 * @type object
-	 */
-	 this._webSocket = false;
+	}
 	
 	/**
 	* Scope duplicator / parent this
@@ -126,6 +117,7 @@ IDE.htwg.Browser = function($){
           }
           
           var msg = {
+            "type": "editor",
             "command": "rename",
             "file": newFileName,
             "value": data.rslt.obj.attr("title"),
@@ -137,18 +129,19 @@ IDE.htwg.Browser = function($){
           }
           
 			    data.rslt.obj.attr("title", newFileName);
-          IDE.htwg.editor.sendMessage( msg );
+          IDE.htwg.websocket.sendMessage( msg );
 			  }
 			})
 	
 			.bind("select_node.jstree", function (event, data) {
 		    if ( data.rslt.obj.attr("rel") === "file" ){
 		    	var msg = {
-	    		  "command" : "load",
+		    	  "type": "editor",
+	    		  "command": "load",
 	    		  "file": data.rslt.obj.attr("title")					    			 
 		   	  };
 			    	 
-		      IDE.htwg.editor.sendMessage( msg );
+		      IDE.htwg.websocket.sendMessage( msg );
 		    }
 			}); 
 	
@@ -203,15 +196,6 @@ IDE.htwg.Browser = function($){
   	}
 	
 	  return items;
-	}
-	
-	this.renameItem = function(obj){
-		var msg = {
-	    "command" : "load",
-		  "file": data.rslt.obj.attr("title"),
-		  "value": "test"
-	  };
-		IDE.htwg.editor.sendMessage( msg );
 	}
 	
 	this.deleteItem = function(obj){

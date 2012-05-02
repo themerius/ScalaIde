@@ -24,14 +24,15 @@ object Application extends Controller {
     val lines = source.mkString
     source.close()
     
-    JsObject(Seq("command" -> JsString("load"),
-    			 "text" -> JsString(lines))).as[JsValue];
+    JsObject(Seq("type" -> JsString("editor"),
+    		         "command" -> JsString("load"),
+    			       "text" -> JsString(lines))).as[JsValue];
     
   }
   
-  def loadError = JsObject(Seq("command" -> JsString("error"),
-		  					   "error" -> JsString("true"),
-    						   "text" -> JsString("Something went wrong while loading!"))).as[JsValue];
+  def loadError = JsObject(Seq("type" -> JsString("editor"),
+  		                         "command" -> JsString("error"),
+                						   "text" -> JsString("Something went wrong while loading!"))).as[JsValue];
     
 
   def save(fileName: String, content: String) = {
@@ -57,8 +58,9 @@ object Application extends Controller {
     val in = Iteratee.foreach[JsValue](this.commandHandling)
 
     val out = Enumerator.pushee[JsValue] {
-    	pushee => pushee.push(JsObject(Seq("command" -> JsString("load"),
-    								 "text" -> JsString("Happy Coding!"))).as[JsValue])
+    	pushee => pushee.push(JsObject(Seq("type" -> JsString("editor"),
+    			                               "command" -> JsString("load"),
+    								                     "text" -> JsString("Happy Coding!"))).as[JsValue])
     	this.out = pushee
     }
 
