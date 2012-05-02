@@ -60,6 +60,7 @@ IDE.htwg.Terminal = function($){
             		"value": "ls"
             };
             that.sendMessage( msg );
+            alert("sended terminal command");
       }
     };
         

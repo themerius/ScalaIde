@@ -114,6 +114,7 @@ object Application extends Controller {
 	  		  save(fileName, value)
 	  		}
         case "terminal:command" => {
+          println("received terminal command")
           val cmd = (msg \ "value").as[String]
           out.push( Terminal.sendCommand(cmd) )
         }
