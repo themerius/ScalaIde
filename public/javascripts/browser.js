@@ -159,32 +159,54 @@ IDE.htwg.Browser = function($){
 	
 	this.customMenu = function(node){
 		
-	    // The default set of all items
-	var items = {
-	    renameItem: {
-			"label": "Rename",
-			"action": function (obj) {
-			  if ( obj.attr("rel") !== "root" )
-			    $("#browser").jstree("rename");
-			  }
-	    },
-	    deleteItem: { // The "delete" menu item
-	        label: "Delete",
-	        action: function (obj) {
-	        	if ($(this._get_node(obj)).hasClass("folder") ){
-	        		return;
-	        	}
-	        	that.deleteItem(obj)
-	        }
-	    }
-	};
+  	var items = {
+      createItem: {
+        label: "Create",
+        action: function (obj) {
+          /*if ($(this._get_node(obj)).hasClass("folder") ){
+            return;
+          }*/
+        },
+        "submenu" : {
+          fileItem: {
+            "label": "File",
+            "action": function (obj) {
+              alert("create file");
+            }
+          },
+          folderItem: {
+            "label": "Folder",
+            "action": function (obj) {
+              alert("create folder");
+            }
+          }
+        }
+      },
+      renameItem: {
+  		  "label": "Rename",
+  		  "action": function (obj) {
+  		    if ( obj.attr("rel") !== "root" )
+  		      $("#browser").jstree("rename");
+  		    }
+      },
+      deleteItem: { // The "delete" menu item
+        label: "Delete",
+        action: function (obj) {
+          if ($(this._get_node(obj)).hasClass("folder") ){
+         		return;
+          }
+          that.deleteItem(obj)
+        }
+      }
+	  };
 	
-	/*if ($(node).hasClass("folder")) {
-	    // Delete the "delete" menu item
-	    delete items.deleteItem;
-	}*/
+  	if ($(node).attr("rel") === "root") {
+  	    // Delete the "delete" menu item
+  	    delete items.deleteItem;
+  	    delete items.renameItem;
+  	}
 	
-	    return items;
+	  return items;
 	}
 	
 	this.renameItem = function(obj){
