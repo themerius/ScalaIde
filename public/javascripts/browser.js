@@ -85,7 +85,7 @@ IDE.htwg.Browser = function($){
 			
 			.bind("rename_node.jstree", function (event, data) {
 			  
-			  var regex = /^[a-zA-Z._ ]*$/;
+			  var regex = /^[a-zA-Z._]*$/;
 			  if (!regex.test(data.rslt.name))
 			  {
           alert("Characters not allowed.");
