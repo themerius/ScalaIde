@@ -17,24 +17,6 @@ IDE.htwg.Editor = function($){
     }
     
     /**
-    * Contains the webSocket
-    *
-    * @var
-    * @access public
-    * @type object
-    */
-    this._webSocket = false;
-    
-    /**
-    * Scope duplicator / parent this
-    *
-    * @var
-    * @access private
-    * @type object
-    */
-    var that = this;
-    
-    /**
     * Constructor
     *
     * Initializes the editor
@@ -42,25 +24,8 @@ IDE.htwg.Editor = function($){
     * @access public
     * @return void
     */
-    this.init = function ( options ) {
-    	$("#editor").keypress(this.handleKey);
-    };
-    
-    /**
-     * Contains the filename
-     *
-     * @var
-     * @access public
-     * @type string
-     */
-    this._fileName = "";
-        
-    	
-    this.sendMessage = function( msg ) {
-    	if ( msg.file ){
-    		this._fileName = msg.file;
-    	}
-    	this._webSocket.send( JSON.stringify( msg ) );
+    this.init = function() {
+    	$("#editor").keyup(this.handleKey);
     };
 
     this.handleKey = function(e) {
@@ -69,34 +34,23 @@ IDE.htwg.Editor = function($){
     	//every key press saves the document, like google doc
             //e.preventDefault();
             var msg = {
+                "type": "editor",
             		"command": "save",
-            		"file": that._fileName,
+            		"file": IDE.htwg.websocket._fileName,
             		"value": window.aceEditor.getSession().getValue()
             };
-            that.sendMessage( msg );
+            IDE.htwg.websocket.sendMessage( msg );
         //}
     };
-        
-    this.receiveEvent = function(event) {
-        var data = JSON.parse(event.data);
-
-    	// Handle errors
-        if(data.error) {
-            //$("#onError span").text(data.error)
-            //$("#onError").show()
-            alert("Error");
-            return;
-        } else {
-        	
-        	//probably there might be more commands
-        	switch (data.command) {
-        		case "load":
-        			window.aceEditor.getSession().setValue(data.text);
-        			break;
-        		default:
-        	}
-        	
-        }        
+    
+    //probably there might be more commands
+    this.executeCommand = function(data){
+      switch ( data.command ){
+        case "load":
+          window.aceEditor.getSession().setValue(data.text);
+          break;
+        default:break;
+      }
     };
     
     this.init();    
