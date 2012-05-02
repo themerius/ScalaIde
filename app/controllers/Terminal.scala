@@ -9,8 +9,9 @@ object Terminal {
 
   def sendCommand(command: String) = {
     JsObject( Seq(
-      "command" -> JsString("terminal:response"),
-      "text" -> JsString( command.!! )
+      "type" -> JsString("terminal"),
+      "command" -> JsString("response"),
+      "value" -> JsString( command.!! )
       )
     ).as[JsValue]
   }
