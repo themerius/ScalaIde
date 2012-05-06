@@ -71,6 +71,7 @@ IDE.htwg.Browser = function($){
           'items' : that.customMenu
         },
         "core" : {
+          "animation": 0,
           "initially_open" : [ "root" ]
         }
       })

@@ -58,23 +58,34 @@ body {
 }
 
 .ace_scroller, .ace_gutter {
-	padding-top: 3px;
+  padding-top: 3px;
 }
 
 .tab{
-   background-color: #eee;
-   border: 1px solid #ddd;
-   font-family: Verdana;
-   font-size: 11px;
-   height: 15px;
-   margin: 5px 3px 0 0;
-   padding: 5px 3px;
-   position: relative;
-   text-align: center;
-   vertical-align: middle;
-   width: 100px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  font-family: Verdana;
+  font-size: 11px;
+  height: 15px;
+  margin: 5px 3px 0 0;
+  padding: 5px 3px;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  width: 100px;
 }
 
 .open{
   background-color: #ddd;	
+}
+
+.tab a{
+  background-image: url("../images/close.gif");
+  background-repeat: no-repeat;
+  height: 10px;
+  position: relative;
+  text-decoration: none;
+  top: 0;
+  width: 10px;
+  margin-left: 5px;
 }

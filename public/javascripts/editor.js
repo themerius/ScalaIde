@@ -86,15 +86,16 @@ IDE.htwg.Editor = function($){
     if ( openSourceFile.length === 0 )
     {
       shortFileName = this._fileName.substring( this._fileName.lastIndexOf("\\") + 1, this._fileName.length );
-      tab = $('<span class="tab open" title="'+ cleanedFileName +'"><a href="#" class="close"></a>' + shortFileName + '</span>');
-      tab.click( function ( ){
-        var parentTab = $(this);
-        targetSourceFile = $("#browser").find("li").filter(function () {
-          var $el = $(this);
-          return $el.attr("title") === parentTab.attr("title").replace(/\//g,"\\");
-        });
-        $("#browser").jstree("deselect_all"); 
-        $("#browser").jstree("select_node", targetSourceFile); 
+      
+      tab = $('<span class="tab open" title="'+ cleanedFileName +'">' + shortFileName + '<a href="#" class="close">&nbsp;&nbsp;&nbsp;</a></span>');
+      
+      tab.click( function ( event ){
+        that.openTabClickHandler(this);
+      });
+      
+      tab.find('a').click( function( event ){
+        event.stopPropagation();
+        that.closeTabClickHander(this);
       });
       
       $("#editorTabs").append(tab);
@@ -109,6 +110,68 @@ IDE.htwg.Editor = function($){
     
     document.title = cleanedFileName;
   };
+  
+  this.openTabClickHandler = function(elem){
+    var parentTab = $(elem);
+
+    targetSourceFile = $("#browser").find("li").filter(function () {
+      var $el = $(this);
+      return $el.attr("title") === parentTab.attr("title").replace(/\//g,"\\");
+    });
+    
+    $("#browser").jstree("deselect_all"); 
+    $("#browser").jstree("select_node", targetSourceFile);
+  }
+  
+  this.closeTabClickHander = function(elem){
+    var parentTab = $(elem).parent();        
+    var prevTab = parentTab.prev();
+    var nextTab = parentTab.next();
+    var closeAll = false;
+    
+    if ( $(elem).parent().nextAll(".open").length > 0 ){
+      var forwardDirection = true;
+    }
+  
+    if ( $(elem).parent().prevAll(".open").length > 0 ){
+      var backDirection = true;
+    }
+    
+    if($(elem).parent(".open").length > 0){
+      if ( nextTab.length > 0 ){
+        that.loadNewTabAfterClosing(nextTab);
+      }
+      else if( prevTab.length > 0 ){
+        that.loadNewTabAfterClosing(prevTab);
+      }
+      else{
+        closeAll = true;
+      }
+    }
+    
+    if (closeAll){
+      $("#browser").jstree("select_node", $("#root"));
+      $("#editorTabs").hide();
+      $("#editor").css("top", 0);
+      window.aceEditor.getSession().setValue("Happy Coding");
+    }
+
+    $("#browser").jstree("deselect_all");
+
+    parentTab.remove();
+  };
+  
+  this.loadNewTabAfterClosing = function( tab ){
+    targetSourceFile = $("#browser").find("li").filter(function () {
+      var $el = $(this);
+      return $el.attr("title") === tab.attr("title").replace(/\//g,"\\");
+    });
+    
+    $("#browser").jstree("select_node", targetSourceFile);
+    
+    tab.addClass("open");
+  };
+
   
   this.closeTab = function(files){
     jQuery.each(files, function(i, filename) {
