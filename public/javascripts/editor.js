@@ -17,6 +17,24 @@ IDE.htwg.Editor = function($){
   }
 
   /**
+  * Contains the filename
+  *
+  * @var
+  * @access public
+  * @type string
+  */
+  this._fileName = "";
+  
+  /**
+   * Scope duplicator / parent this
+   *
+   * @var
+   * @access private
+   * @type object
+   */
+   var that = this;
+  
+  /**
   * Constructor
   *
   * Initializes the editor
@@ -32,11 +50,10 @@ IDE.htwg.Editor = function($){
     var msg = {
       "type": "editor",
       "command": "save",
-      "file": IDE.htwg.websocket._fileName,
+      "file": that._fileName,
       "value": window.aceEditor.getSession().getValue()
     };
     IDE.htwg.websocket.sendMessage( msg );
-
   };
 
   //probably there might be more commands
@@ -44,9 +61,19 @@ IDE.htwg.Editor = function($){
     switch ( data.command ){
       case "load":
         window.aceEditor.getSession().setValue(data.text);
+        this._fileName = data.filename;
+        break;
+      case "remove":
+        this.closeTab(data.value);
         break;
       default:break;
     }
+  };
+  
+  this.closeTab = function(files){
+    jQuery.each(files, function(i, filename) {
+      console.log(filename);
+    });
   };
 
   this.init();    

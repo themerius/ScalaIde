@@ -27,6 +27,7 @@ object Application extends Controller {
     JsObject(Seq(
       "type" -> JsString("editor"),
       "command" -> JsString("load"),
+      "filename" -> JsString(fileName),
       "text" -> JsString(lines))
     ).as[JsValue];
     
@@ -43,6 +44,25 @@ object Application extends Controller {
       new FileOutputStream(fileName), "UTF-8")
     out.write(content)
     out.close
+  }
+  
+  def delete(file: File) : Unit = {
+    if(file.isDirectory){
+      val subfiles = file.listFiles
+      if(subfiles != null)
+        subfiles.foreach{ f => delete(f) }
+    }
+    file.delete
+  }
+  
+  def create(fileName: String, isDir: Boolean) = {
+  	val file = new File(fileName);
+  	if (isDir){
+  		file.mkdir()
+  	}
+    else{
+    	file.createNewFile()
+    }
   }
 
   def rename(fileName: String, newFileName: String) = {
@@ -80,7 +100,7 @@ object Application extends Controller {
    */
 
   def commandHandling(msg: JsValue) = {
-    //TODO: ERROR when js key not exists
+    //TODO: ERROR when js key not exists or IO Exception
     val command = (msg \ "command").as[String]
     val fileName = (msg \ "file").as[String]
 
@@ -93,6 +113,21 @@ object Application extends Controller {
       case "command" => {  // Terminal command!
         val cmd = (msg \ "value").as[String]
         out.push( Terminal.sendCommand(cmd) )
+      }
+      case "create" => {
+      	val folder = (msg \ "folder").as[Boolean]
+        create(fileName, folder)
+        if ( !folder )
+          out.push(load( fileName ))
+      }
+      case "remove" => {
+        delete(new File(fileName))
+        out.push( JsObject( Seq(
+          "type" -> JsString("editor"),
+          "command" -> JsString("remove"),
+          "value" -> (msg \ "list"))
+          ).as[JsValue]
+        )
       }
       case "rename" => {
         val oldFileName = (msg \ "value").as[String]
