@@ -174,8 +174,11 @@ IDE.htwg.Editor = function($){
 
   
   this.closeTab = function(files){
-    jQuery.each(files, function(i, filename) {
-      console.log(filename);
+    jQuery.each(files, function(i, file) {
+      cleanedFileName = file.file.replace(/\\/g,"/"); 
+      $("#editorTabs").find('span[title="'+ cleanedFileName +'"]').each(function(i, elem){
+        that.closeTabClickHander($(elem).find("a"));
+      });
     });
   };
 
