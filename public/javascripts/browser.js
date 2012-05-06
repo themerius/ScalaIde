@@ -25,9 +25,6 @@ IDE.htwg.Browser = function($){
   */
   var that = this;
 
-  // TODO: 1. befehle in scala implementieren -> - file/ordner anlegen,
-  //                                             - file/ordner löschen,  
-
 
   this.initialize = function(){
     
@@ -277,6 +274,7 @@ IDE.htwg.Browser = function($){
       },
       renameItem: {
         "label": "Rename",
+        "separator_before": true,
         "action": function (obj) {
             jQuery("#relPath").val(that.getRelativePathOfObject(obj));              
             $("#browser").jstree("rename");

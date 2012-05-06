@@ -2,10 +2,19 @@ body {
     overflow: hidden;
 }
 
+#editorTabs { 
+    margin-top: 5px;
+    position: absolute;
+    top: 0;
+    left: 300px;
+    right: 0;
+    height:33px;
+}
+
 #editor { 
     margin: 0;
     position: absolute;
-    top: 0;
+    top: 0px;
     bottom: 200px;
     left: 300px;
     right: 0;
@@ -46,4 +55,26 @@ body {
 #vakata-contextmenu{
 	font-family: Verdana;
 	font-size: 11px;
+}
+
+.ace_scroller, .ace_gutter {
+	padding-top: 3px;
+}
+
+.tab{
+   background-color: #eee;
+   border: 1px solid #ddd;
+   font-family: Verdana;
+   font-size: 11px;
+   height: 15px;
+   margin: 5px 3px 0 0;
+   padding: 5px 3px;
+   position: relative;
+   text-align: center;
+   vertical-align: middle;
+   width: 100px;
+}
+
+.open{
+  background-color: #ddd;	
 }

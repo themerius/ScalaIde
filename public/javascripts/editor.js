@@ -60,14 +60,54 @@ IDE.htwg.Editor = function($){
   this.executeCommand = function(data){
     switch ( data.command ){
       case "load":
-        window.aceEditor.getSession().setValue(data.text);
-        this._fileName = data.filename;
+        this.loadSourceFile(data);
         break;
       case "remove":
         this.closeTab(data.value);
         break;
       default:break;
     }
+  };
+  
+  this.loadSourceFile = function(data){
+    window.aceEditor.getSession().setValue(data.text);
+    this._fileName = data.filename;
+    
+    if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      return;
+    }
+    $("#editorTabs").show();
+    $("#editor").css("top", $("#editorTabs").css("height"));
+    
+    cleanedFileName = this._fileName.replace(/\\/g,"/"); 
+    
+    openSourceFile = $("#editorTabs").find('span[title="'+ cleanedFileName +'"]')
+    
+    if ( openSourceFile.length === 0 )
+    {
+      shortFileName = this._fileName.substring( this._fileName.lastIndexOf("\\") + 1, this._fileName.length );
+      tab = $('<span class="tab open" title="'+ cleanedFileName +'"><a href="#" class="close"></a>' + shortFileName + '</span>');
+      tab.click( function ( ){
+        var parentTab = $(this);
+        targetSourceFile = $("#browser").find("li").filter(function () {
+          var $el = $(this);
+          return $el.attr("title") === parentTab.attr("title").replace(/\//g,"\\");
+        });
+        $("#browser").jstree("deselect_all"); 
+        $("#browser").jstree("select_node", targetSourceFile); 
+      });
+      
+      $("#editorTabs").append(tab);
+    }
+    else{
+      openSourceFile.addClass("open");
+    }
+  
+    $("#editorTabs").find('span[title!="'+ cleanedFileName +'"]').each(function(i, elem){
+      $(elem).removeClass("open");
+    });
+    
+    document.title = cleanedFileName;
   };
   
   this.closeTab = function(files){
