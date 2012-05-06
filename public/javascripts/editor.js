@@ -128,15 +128,7 @@ IDE.htwg.Editor = function($){
     var prevTab = parentTab.prev();
     var nextTab = parentTab.next();
     var closeAll = false;
-    
-    if ( $(elem).parent().nextAll(".open").length > 0 ){
-      var forwardDirection = true;
-    }
-  
-    if ( $(elem).parent().prevAll(".open").length > 0 ){
-      var backDirection = true;
-    }
-    
+        
     if($(elem).parent(".open").length > 0){
       if ( nextTab.length > 0 ){
         that.loadNewTabAfterClosing(nextTab);
@@ -145,19 +137,13 @@ IDE.htwg.Editor = function($){
         that.loadNewTabAfterClosing(prevTab);
       }
       else{
-        closeAll = true;
+        $("#browser").jstree("deselect_all");
+        $("#browser").jstree("select_node", $("#root"));
+        $("#editorTabs").hide();
+        $("#editor").css("top", 0);
+        window.aceEditor.getSession().setValue("Happy Coding");
       }
     }
-    
-    if (closeAll){
-      $("#browser").jstree("select_node", $("#root"));
-      $("#editorTabs").hide();
-      $("#editor").css("top", 0);
-      window.aceEditor.getSession().setValue("Happy Coding");
-    }
-
-    $("#browser").jstree("deselect_all");
-
     parentTab.remove();
   };
   
@@ -167,6 +153,7 @@ IDE.htwg.Editor = function($){
       return $el.attr("title") === tab.attr("title").replace(/\//g,"\\");
     });
     
+    $("#browser").jstree("deselect_all");
     $("#browser").jstree("select_node", targetSourceFile);
     
     tab.addClass("open");
