@@ -17,6 +17,24 @@ IDE.htwg.Editor = function($){
   }
 
   /**
+  * Contains the filename
+  *
+  * @var
+  * @access public
+  * @type string
+  */
+  this._fileName = "";
+  
+  /**
+   * Scope duplicator / parent this
+   *
+   * @var
+   * @access private
+   * @type object
+   */
+   var that = this;
+  
+  /**
   * Constructor
   *
   * Initializes the editor
@@ -32,21 +50,123 @@ IDE.htwg.Editor = function($){
     var msg = {
       "type": "editor",
       "command": "save",
-      "file": IDE.htwg.websocket._fileName,
+      "file": that._fileName,
       "value": window.aceEditor.getSession().getValue()
     };
     IDE.htwg.websocket.sendMessage( msg );
-
   };
 
   //probably there might be more commands
   this.executeCommand = function(data){
     switch ( data.command ){
       case "load":
-        window.aceEditor.getSession().setValue(data.text);
+        this.loadSourceFile(data);
+        break;
+      case "remove":
+        this.closeTab(data.value);
         break;
       default:break;
     }
+  };
+  
+  this.loadSourceFile = function(data){
+    window.aceEditor.getSession().setValue(data.text);
+    this._fileName = data.filename;
+    
+    if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      return;
+    }
+    $("#editorTabs").show();
+    $("#editor").css("top", $("#editorTabs").css("height"));
+    
+    cleanedFileName = this._fileName.replace(/\\/g,"/"); 
+    
+    openSourceFile = $("#editorTabs").find('span[title="'+ cleanedFileName +'"]')
+    
+    if ( openSourceFile.length === 0 )
+    {
+      shortFileName = this._fileName.substring( this._fileName.lastIndexOf("\\") + 1, this._fileName.length );
+      
+      tab = $('<span class="tab open" title="'+ cleanedFileName +'">' + shortFileName + '<a href="#" class="close">&nbsp;&nbsp;&nbsp;</a></span>');
+      
+      tab.click( function ( event ){
+        that.openTabClickHandler(this);
+      });
+      
+      tab.find('a').click( function( event ){
+        event.stopPropagation();
+        that.closeTabClickHander(this);
+      });
+      
+      $("#editorTabs").append(tab);
+    }
+    else{
+      openSourceFile.addClass("open");
+    }
+  
+    $("#editorTabs").find('span[title!="'+ cleanedFileName +'"]').each(function(i, elem){
+      $(elem).removeClass("open");
+    });
+    
+    document.title = cleanedFileName;
+  };
+  
+  this.openTabClickHandler = function(elem){
+    var parentTab = $(elem);
+
+    targetSourceFile = $("#browser").find("li").filter(function () {
+      var $el = $(this);
+      return $el.attr("title") === parentTab.attr("title").replace(/\//g,"\\");
+    });
+    
+    $("#browser").jstree("deselect_all"); 
+    $("#browser").jstree("select_node", targetSourceFile);
+  }
+  
+  this.closeTabClickHander = function(elem){
+    var parentTab = $(elem).parent();        
+    var prevTab = parentTab.prev();
+    var nextTab = parentTab.next();
+    var closeAll = false;
+        
+    if($(elem).parent(".open").length > 0){
+      if ( nextTab.length > 0 ){
+        that.loadNewTabAfterClosing(nextTab);
+      }
+      else if( prevTab.length > 0 ){
+        that.loadNewTabAfterClosing(prevTab);
+      }
+      else{
+        $("#browser").jstree("deselect_all");
+        $("#browser").jstree("select_node", $("#root"));
+        $("#editorTabs").hide();
+        $("#editor").css("top", 0);
+        window.aceEditor.getSession().setValue("Happy Coding");
+      }
+    }
+    parentTab.remove();
+  };
+  
+  this.loadNewTabAfterClosing = function( tab ){
+    targetSourceFile = $("#browser").find("li").filter(function () {
+      var $el = $(this);
+      return $el.attr("title") === tab.attr("title").replace(/\//g,"\\");
+    });
+    
+    $("#browser").jstree("deselect_all");
+    $("#browser").jstree("select_node", targetSourceFile);
+    
+    tab.addClass("open");
+  };
+
+  
+  this.closeTab = function(files){
+    jQuery.each(files, function(i, file) {
+      cleanedFileName = file.file.replace(/\\/g,"/"); 
+      $("#editorTabs").find('span[title="'+ cleanedFileName +'"]').each(function(i, elem){
+        that.closeTabClickHander($(elem).find("a"));
+      });
+    });
   };
 
   this.init();    

@@ -20,19 +20,7 @@ IDE.htwg.Websocket = function($){
   */
   this._websocket = false;
 
-  /**
-   * Contains the filename
-   *
-   * @var
-   * @access public
-   * @type string
-   */
-  this._fileName = "";
-
   this.sendMessage = function( msg ) {
-    if ( msg.file && !msg.folder ){
-      this._fileName = msg.file;
-    }
     this._websocket.send( JSON.stringify( msg ) );
   };
 
