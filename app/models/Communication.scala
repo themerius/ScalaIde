@@ -51,12 +51,12 @@ object Communication {
   }
   
   def create(fileName: String, isDir: Boolean) = {
-  	val file = new File(fileName);
-  	if (isDir){
-  		file.mkdir()
-  	}
+    val file = new File(fileName);
+    if (isDir){
+      file.mkdir()
+    }
     else{
-    	file.createNewFile()
+      file.createNewFile()
     }
   }
 
@@ -71,10 +71,24 @@ object Communication {
     these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
 
-  def commandHandling(msg: JsValue) = {
-    //TODO: ERROR when js key not exists or IO Exception
-    val command = (msg \ "command").as[String]
-    val fileName = (msg \ "file").as[String]
+  def commandHandling(message: JsValue) = {
+    val messageType = (message \ "type").as[String]
+    val command = (message \ "command").as[String]
+
+    messageType match {
+      case "editor" => editorCommandHandling(message, command)
+      case "browser" => browserCommandHandling(message, command)
+      case "terminal" => terminalCommandHandling(message, command)
+      case _ => println("Received undefined messages from websocket.")
+    }
+
+  }
+
+  def editorCommandHandling(message: JsValue, command: String) = {
+    val msg = message.as[JsObject]
+    var fileName = ""
+    if ( msg.keys.contains("file") )
+      fileName = (msg \ "file").as[String]
 
     command match {
       case "load" => out.push(load( fileName ))
@@ -82,12 +96,8 @@ object Communication {
         val value = (msg \ "value").as[String]
         save(fileName, value)
       }
-      case "command" => {  // Terminal command!
-        val cmd = (msg \ "value").as[String]
-        out.push( Terminal.sendCommand(cmd) )
-      }
       case "create" => {
-      	val folder = (msg \ "folder").as[Boolean]
+        val folder = (msg \ "folder").as[Boolean]
         create(fileName, folder)
         if ( !folder )
           out.push(load( fileName ))
@@ -108,7 +118,21 @@ object Communication {
         if ( !folder )
           out.push(load( fileName ))
       }
-      case "" => out.push(loadError)
+      case _ => out.push(loadError)
+    }
+  }
+
+  def browserCommandHandling(message: JsValue, command: String) = {
+
+  }
+
+  def terminalCommandHandling(message: JsValue, command: String) = {
+    command match {
+      case "command" => {
+        val cmd = (message \ "value").as[String]
+        out.push( Terminal.sendCommand(cmd) )
+      }
+      case _ => out.push(loadError)
     }
   }
 
