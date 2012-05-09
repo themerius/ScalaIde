@@ -128,9 +128,9 @@ object Communication {
 
   def terminalCommandHandling(message: JsValue, command: String) = {
     command match {
-      case "command" => {
-        val cmd = (message \ "value").as[String]
-        out.push( Terminal.sendCommand(cmd) )
+      case "keyEvent" => {
+        val cmd = (message \ "value").as[Int]
+        Terminal.handleKey(cmd)
       }
       case _ => out.push(loadError)
     }

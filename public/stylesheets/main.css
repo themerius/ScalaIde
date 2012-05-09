@@ -31,6 +31,10 @@ body {
     color: #8F938F;
 }
 
+#terminal-input {
+	font: 12px Monaco, "Menlo", "Courier New", monospace;
+}
+
 #terminal textarea{
     background: none repeat scroll 0 0 transparent;
     border: medium none;
