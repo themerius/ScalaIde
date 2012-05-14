@@ -1,4 +1,4 @@
-package compiler
+package models
 
 import scala.tools.nsc.reporters.Reporter
 import scala.tools.nsc.io._
@@ -23,7 +23,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     // existing compiler or create a new one?
     val settings = new Settings()
     settings.classpath.value = jars.map(_.getAbsolutePath).mkString("", sep, "")
-    
+
     // TODO: What does this do?
     /*
     settings.sourcepath.value = {
@@ -40,6 +40,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   loadSources(srcs)
   
   override def loadSources(srcFiles: Seq[SourceFile]) = {
+  	
     val (updated, deleted) = updateSources(srcFiles)
     
     // Remove the source files that have been deleted
@@ -128,20 +129,28 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   
   
   class PresentationReporter extends Reporter {
+  	  	
     import PresentationReporter._
     import scala.collection.mutable.ListBuffer
     
     var compiler: Global = null
     var problems = ListBuffer[Problem]()
-    
+        
     override def info0(pos: scala.tools.nsc.util.Position, msg: String, severity: Severity, force: Boolean): Unit = {
       severity.count += 1
-      
+
       try {
+
         if(pos.isDefined) {
           //val source = pos.source
           //val length = source.identifier(pos, compiler).map(_.length).getOrElse(0)
           val position = PresentationCompiler.Position(pos.source.path, pos.line, pos.column)
+          
+          
+          //SISCHNEE: WRITE AN ERROR AND LOOK AT CONSOLE:
+          println(formatMessage(msg))
+          
+          
           problems += Problem(position, formatMessage(msg), severity.id)
         }
       } catch {

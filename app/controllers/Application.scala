@@ -11,11 +11,13 @@ import play.api.libs.iteratee._
 import play.api.libs.concurrent._
 
 import models.Communication
+import models.Project
 
 
 object Application extends Controller {
 
   def index = Action { implicit request =>
+  	new Project("projectspace")
     Ok(views.html.index("Ace Editor", new File("projectspace")))
   }
 

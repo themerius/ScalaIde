@@ -1,4 +1,4 @@
-package compiler
+package models
 
 import scala.tools.nsc.util._
 import scala.tools.nsc.reporters.Reporter
@@ -30,6 +30,7 @@ trait PresentationCompiler {
    */
   def updateSources(srcFiles: Seq[SourceFile]): (Seq[SourceFile], Seq[SourceFile]) = {
     import scala.collection.mutable.ListBuffer;
+    
     val updated = new ListBuffer[SourceFile]
     
     // For each source file, if it's already in the map, check its last
