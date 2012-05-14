@@ -7,8 +7,10 @@ IDE.htwg = IDE.htwg || {};
 
 IDE.htwg.Terminal = function($){
 
+  var responses = ""
+
   this.init = function ( options ) {
-    $("#terminal-input").keyup(this.handleKey);
+    $("#terminal-input").keypress(this.handleKey);
   };
 
   this.handleKey = function(e) {
@@ -23,7 +25,8 @@ IDE.htwg.Terminal = function($){
   this.executeCommand = function(data){
     switch ( data.command ){
       case "response":
-        $("#terminal-input").val(data.value);
+        responses = responses + data.value + '\n'
+        $("#terminal-input").val(responses)
         break;
       default:break;
     }

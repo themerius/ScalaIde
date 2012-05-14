@@ -33,6 +33,8 @@ object Application extends Controller {
       Communication.out = pushee
     }
 
+    models.Terminal.start
+
     Promise.pure((in,out)) 
   }
 

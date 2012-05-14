@@ -9,7 +9,28 @@ object Terminal {
 
   // TODO: Refactor: make concurrent (multiuser)
 
-  var commandBuffer = ""  // new scala.collection.mutable.ArrayBuffer[Byte]
+  var input: java.io.OutputStream = _
+
+  def start = {
+    val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
+    "bash -il".run(pio)
+  }
+
+  def stdin(in: java.io.OutputStream) = {
+    this.input = in
+  }
+
+  def stdout(out: java.io.InputStream) = {
+    val lines = scala.io.Source.fromInputStream(out).getLines
+    def inner(str: String) = sendToWebsocket("stdout: " + str)
+    lines.foreach(inner)
+  }
+
+  def stderr(out: java.io.InputStream) = {
+    val lines = scala.io.Source.fromInputStream(out).getLines
+    def inner(str: String) = println(str)// TODO sendToWebsocket("stderr: " + str)
+    lines.foreach(inner)
+  }
 
   def sendToWebsocket(output: String) = {
     val msg = JsObject( Seq(
@@ -21,36 +42,13 @@ object Terminal {
     Communication.out.push(msg)
   }
 
-  def handleKey(receivedKey: Int) = {
-    if (receivedKey == 13)
-      invokeCommand
-    else
-      commandBuffer = commandBuffer + receivedKey.toChar
-  }
-
-  def invokeCommand {
-    def stdin(input: java.io.OutputStream) = {
-      //input.write("'x'".getBytes)
-      //input.write(13)
-      //input.flush()
-      input.close()
+  def handleKey(receivedKey: Byte) = {
+    if (receivedKey == 13) {
+      input.write(receivedKey)
+      input.flush()
+    } else {
+      input.write(receivedKey)
     }
-
-    def stdout(output: java.io.InputStream) = {
-      val lines = scala.io.Source.fromInputStream(output).getLines
-      var buffer = ""
-      for (line <- lines)
-        buffer = buffer + line + "\n"
-      sendToWebsocket(buffer)
-    }
-
-    val pio = new ProcessIO(stdin, stdout,
-      stderr => scala.io.Source.fromInputStream(stderr).getLines.foreach(println)
-    )
-
-    commandBuffer.run(pio)
-    commandBuffer = ""
-
   }
 
 }

@@ -130,7 +130,7 @@ object Communication {
     command match {
       case "keyEvent" => {
         val cmd = (message \ "value").as[Int]
-        Terminal.handleKey(cmd)
+        Terminal.handleKey(cmd.toByte)
       }
       case _ => out.push(loadError)
     }
