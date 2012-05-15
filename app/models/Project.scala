@@ -21,7 +21,7 @@ class Project(projectPath: String) {
     
     def libDirs = {
      // val playLibs = playRoot + "/framework/sbt/"
-      val scalaLibs = "D:\\eclipse\\configuration\\org.eclipse.osgi\\bundles\\768\\1\\.cp\\lib"
+      val scalaLibs = "D:\\eclipse/configuration/org.eclipse.osgi/bundles/768/1/.cp/lib"
       Seq(new File(scalaLibs))
     }
           
@@ -76,13 +76,6 @@ class Project(projectPath: String) {
   //this is for compiling
   def compile(filePath: String): Seq[PresentationCompiler.Problem] = {
     update()
-    
-    
-    sourceFileMap.get(new File(filePath)).map(compiler.compile).map( prob =>
-    	{println("s")}
-    )
-    
-    
     sourceFileMap.get(new File(filePath)).map(compiler.compile).getOrElse(Seq())
   }
   

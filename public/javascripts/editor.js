@@ -83,15 +83,13 @@ IDE.htwg.Editor = function($){
     $("#editorTabs").show();
     $("#editor").css("top", $("#editorTabs").css("height"));
     
-    cleanedFileName = this._fileName.replace(/\\/g,"/"); 
-    
-    openSourceFile = $("#editorTabs").find('span[title="'+ cleanedFileName +'"]')
+    openSourceFile = $("#editorTabs").find('span[title="'+ this._fileName +'"]')
     
     if ( openSourceFile.length === 0 )
     {
-      shortFileName = this._fileName.substring( this._fileName.lastIndexOf("\\") + 1, this._fileName.length );
+      shortFileName = this._fileName.substring( this._fileName.lastIndexOf("/") + 1, this._fileName.length );
       
-      tab = $('<span class="tab open" title="'+ cleanedFileName +'">' + shortFileName + '<a href="#" class="close">&nbsp;&nbsp;&nbsp;</a></span>');
+      tab = $('<span class="tab open" title="'+ this._fileName +'">' + shortFileName + '<a href="#" class="close">&nbsp;&nbsp;&nbsp;</a></span>');
       
       tab.click( function ( event ){
         that.openTabClickHandler(this);
@@ -108,11 +106,11 @@ IDE.htwg.Editor = function($){
       openSourceFile.addClass("open");
     }
   
-    $("#editorTabs").find('span[title!="'+ cleanedFileName +'"]').each(function(i, elem){
+    $("#editorTabs").find('span[title!="'+ this._fileName +'"]').each(function(i, elem){
       $(elem).removeClass("open");
     });
     
-    document.title = cleanedFileName;
+    document.title = this._fileName;
   };
   
   this.openTabClickHandler = function(elem){
@@ -120,7 +118,7 @@ IDE.htwg.Editor = function($){
 
     targetSourceFile = $("#browser").find("li").filter(function () {
       var $el = $(this);
-      return $el.attr("title") === parentTab.attr("title").replace(/\//g,"\\");
+      return $el.attr("title") === parentTab.attr("title");
     });
     
     $("#browser").jstree("deselect_all"); 
@@ -154,7 +152,7 @@ IDE.htwg.Editor = function($){
   this.loadNewTabAfterClosing = function( tab ){
     targetSourceFile = $("#browser").find("li").filter(function () {
       var $el = $(this);
-      return $el.attr("title") === tab.attr("title").replace(/\//g,"\\");
+      return $el.attr("title") === tab.attr("title");
     });
     
     $("#browser").jstree("deselect_all");
@@ -165,8 +163,7 @@ IDE.htwg.Editor = function($){
 
   this.closeTab = function(files){
     jQuery.each(files, function(i, file) {
-      cleanedFileName = file.file.replace(/\\/g,"/"); 
-      $("#editorTabs").find('span[title="'+ cleanedFileName +'"]').each(function(i, elem){
+      $("#editorTabs").find('span[title="'+ file.file +'"]').each(function(i, elem){
         that.closeTabClickHander($(elem).find("a"));
       });
     });
