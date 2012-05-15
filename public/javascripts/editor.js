@@ -48,7 +48,7 @@ IDE.htwg.Editor = function($){
 
   this.handleKey = function(e) {
     
-    if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+    if ( that._fileName == "" || typeof that._fileName === "undefined" ){
       return;
     }
     
@@ -80,6 +80,7 @@ IDE.htwg.Editor = function($){
   
   this.loadSourceFile = function(data){
     window.aceEditor.getSession().setValue(data.text);
+    
     this._fileName = data.filename;
     
     if ( this._fileName == "" || typeof this._fileName === "undefined" ){
@@ -135,7 +136,6 @@ IDE.htwg.Editor = function($){
     var parentTab = $(elem).parent();        
     var prevTab = parentTab.prev();
     var nextTab = parentTab.next();
-    var closeAll = false;
         
     if($(elem).parent(".open").length > 0){
       if ( nextTab.length > 0 ){
@@ -149,6 +149,7 @@ IDE.htwg.Editor = function($){
         $("#browser").jstree("select_node", $("#root"));
         $("#editorTabs").hide();
         $("#editor").css("top", 0);
+        that._fileName = "";
         window.aceEditor.getSession().setValue("Happy Coding");
       }
     }
@@ -176,7 +177,8 @@ IDE.htwg.Editor = function($){
   };
   
   this.compileSourceFile = function(data){
-    this._fileName = data.filename;
+    
+    /*this._fileName = data.filename;
     
     if ( this._fileName == "" || typeof this._fileName === "undefined" ){
       this._fileName = "";
@@ -188,7 +190,7 @@ IDE.htwg.Editor = function($){
       "command": "compile",
       "file": that._fileName
     };
-    IDE.htwg.websocket.sendMessage( msg );
+    IDE.htwg.websocket.sendMessage( msg );*/
   };
   
   this.showCompileMessage = function(data){
