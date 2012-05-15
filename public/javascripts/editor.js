@@ -47,6 +47,11 @@ IDE.htwg.Editor = function($){
   };
 
   this.handleKey = function(e) {
+    
+    if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      return;
+    }
+    
     var msg = {
       "type": "editor",
       "command": "save",
@@ -78,6 +83,7 @@ IDE.htwg.Editor = function($){
     this._fileName = data.filename;
     
     if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      this._fileName = "";
       return;
     }
     $("#editorTabs").show();
@@ -173,6 +179,7 @@ IDE.htwg.Editor = function($){
     this._fileName = data.filename;
     
     if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      this._fileName = "";
       return;
     }
     
