@@ -10,10 +10,16 @@ object Terminal {
   // TODO: Refactor: make concurrent (multiuser)
 
   var input: java.io.OutputStream = _
+  var deactivated = false
 
   def start = {
-    val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
-    "bash -il".run(pio)
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      deactivated = true
+      println("This feature only available on unix, yet.")
+    } else {
+      val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
+      "bash -il".run(pio)
+    }
   }
 
   def stdin(in: java.io.OutputStream) = {
@@ -43,11 +49,16 @@ object Terminal {
   }
 
   def handleKey(receivedKey: Byte) = {
-    if (receivedKey == 13) {
-      input.write(receivedKey)
-      input.flush()
+    if (deactivated) {
+      println("Terminal-feature deactivated.")
     } else {
-      input.write(receivedKey)
+      receivedKey match {
+        case 13 => {
+          input.write(receivedKey)
+          input.flush()
+        }
+        case _ => input.write(receivedKey)
+      }
     }
   }
 
