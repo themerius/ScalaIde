@@ -10,9 +10,12 @@
 	</ul>
 </div>
 
+<input type="hidden" id="removeFile" name="removeItem" value="false" />
+<input type="hidden" id="browserMode" name="mode" value="" />
+<input type="hidden" id="relPath" name="path" value="" />
+
 <script type="text/javascript">
 	jQuery(document).ready(function(){
 		IDE.htwg.browser = new IDE.htwg.Browser( jQuery );
-		IDE.htwg.browser._webSocket = window.webSocket;
 	});
 </script>
