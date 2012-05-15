@@ -64,7 +64,6 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     reporter.reset
     compiler.askType(file, false, typedResult)
     typedResult.get
-    
     reporter.problems
   }
   

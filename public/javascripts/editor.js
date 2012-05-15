@@ -61,6 +61,10 @@ IDE.htwg.Editor = function($){
     switch ( data.command ){
       case "load":
         this.loadSourceFile(data);
+        this.compileSourceFile(data);
+        break;
+      case "compile":
+        this.showCompileMessage(data);
         break;
       case "remove":
         this.closeTab(data.value);
@@ -159,7 +163,6 @@ IDE.htwg.Editor = function($){
     tab.addClass("open");
   };
 
-  
   this.closeTab = function(files){
     jQuery.each(files, function(i, file) {
       cleanedFileName = file.file.replace(/\\/g,"/"); 
@@ -167,6 +170,25 @@ IDE.htwg.Editor = function($){
         that.closeTabClickHander($(elem).find("a"));
       });
     });
+  };
+  
+  this.compileSourceFile = function(data){
+    this._fileName = data.filename;
+    
+    if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      return;
+    }
+    
+    var msg = {
+      "type": "editor",
+      "command": "compile",
+      "file": that._fileName
+    };
+    IDE.htwg.websocket.sendMessage( msg );
+  };
+  
+  this.showCompileMessage = function(data){
+    console.log(data);
   };
 
   this.init();    

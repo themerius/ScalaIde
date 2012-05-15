@@ -13,19 +13,20 @@ import play.api.libs.concurrent._
 object Communication {
 
   var out: Enumerator.Pushee[JsValue] = _
+  
+  var project: Project = _
  
   def load(fileName: String): JsValue = {
     val source = scala.io.Source.fromFile(fileName)
     val lines = source.mkString
     source.close()
-
+    
     JsObject(Seq(
       "type" -> JsString("editor"),
       "command" -> JsString("load"),
       "filename" -> JsString(fileName),
       "text" -> JsString(lines))
     ).as[JsValue];
-    
   }
 
   def loadError = JsObject(Seq(
@@ -70,6 +71,34 @@ object Communication {
     val these = f.listFiles
     these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
+  
+  def compile(filePath:String): JsValue = {
+  	  	
+    def getType(severity: Int) = severity match {
+      case 1 => "warning"
+      case 2 => "error"
+      case _ => "ignore"
+    }
+        
+    //SISCHNEE: TODO: problem listbuffer is empty?!
+    var probMessages: String = project.compile(filePath).map(prob => {
+      "{" +
+      "\"source\":\"" + prob.pos.source + "\"," +
+      "\"row\":" + prob.pos.line + "," +
+      "\"column\":" + prob.pos.column + "," +
+      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
+      "\"type\":\"" + getType(prob.severity) + "\"" +
+      "}"
+    }).mkString("[", ",", "]")
+    
+    JsObject(Seq(
+      "type" -> JsString("editor"),
+      "command" -> JsString("compile"),
+      "filename" -> JsString(filePath),
+      "text" -> JsString(probMessages))
+    ).as[JsValue]
+    
+  }
 
   def commandHandling(msg: JsValue) = {
     //TODO: ERROR when js key not exists or IO Exception
@@ -85,6 +114,9 @@ object Communication {
       case "command" => {  // Terminal command!
         val cmd = (msg \ "value").as[String]
         out.push( Terminal.sendCommand(cmd) )
+      }
+      case "compile" => {
+        out.push( compile( fileName ) )
       }
       case "create" => {
       	val folder = (msg \ "folder").as[Boolean]

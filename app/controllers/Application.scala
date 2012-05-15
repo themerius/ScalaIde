@@ -17,7 +17,7 @@ import models.Project
 object Application extends Controller {
 
   def index = Action { implicit request =>
-  	new Project("projectspace")
+  	Communication.project = new Project("projectspace")
     Ok(views.html.index("Ace Editor", new File("projectspace")))
   }
 
