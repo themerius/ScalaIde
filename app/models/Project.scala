@@ -76,7 +76,7 @@ class Project(projectPath: String) {
   //this is for compiling
   def compile(filePath: String): Seq[PresentationCompiler.Problem] = {
     update()
-    sourceFileMap.get(new File(filePath)).map(compiler.compile).getOrElse(Seq())
+    sourceFileMap.get(new File(new File(filePath).getAbsolutePath())).map(compiler.compile).getOrElse(Seq())
   }
   
   //this is for auto-completing

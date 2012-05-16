@@ -51,20 +51,33 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     
     // Reload the source files that need to be updated
     val srcList = updated.map(toSourceFile(_)).toList
-    //println(srcList)
+    println(srcList)
+    
     val reloadResult = new Response[Unit]
     compiler.askReload(srcList, reloadResult)
-    reloadResult.get
+    
+    for (source <- srcList) {
+    	val response = new Response[compiler.Tree]
+      compiler.askLoadedTyped(source, response)
+      response.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
+    }
+    
+    reporter.problems
   }
   
   
   override def compile(src: SourceFile): Seq[Problem] = {
+  	reporter.reset
+  	    
     val file = toSourceFile(src)
     val typedResult = new Response[compiler.Tree]
-    reporter.reset
-    compiler.askType(file, false, typedResult)
-    typedResult.get
-    reporter.problems
+  	
+  	//true is for forcereload! this is probably not needed in case of loadedsrc
+    compiler.askType(file, true, typedResult)
+
+    typedResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
+      	
+  	reporter.problems
   }
   
   override def complete(src: SourceFile, line: Int, column: Int): Seq[CompleteOption] = {
@@ -129,6 +142,8 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   
   class PresentationReporter extends Reporter {
   	  	
+  	println("reporter");
+  	
     import PresentationReporter._
     import scala.collection.mutable.ListBuffer
     

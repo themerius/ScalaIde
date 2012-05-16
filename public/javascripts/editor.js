@@ -178,7 +178,7 @@ IDE.htwg.Editor = function($){
   
   this.compileSourceFile = function(data){
     
-    /*this._fileName = data.filename;
+    this._fileName = data.filename;
     
     if ( this._fileName == "" || typeof this._fileName === "undefined" ){
       this._fileName = "";
@@ -190,7 +190,7 @@ IDE.htwg.Editor = function($){
       "command": "compile",
       "file": that._fileName
     };
-    IDE.htwg.websocket.sendMessage( msg );*/
+    IDE.htwg.websocket.sendMessage( msg );
   };
   
   this.showCompileMessage = function(data){
