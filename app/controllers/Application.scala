@@ -13,7 +13,12 @@ import scala.util.Random
 object Application extends Controller {
 
   def index = Action { implicit request =>
-    Ok(views.html.index("Ace Editor", new File("projectspace"), "11"))
+    
+    // TODO Random needs to be replaced with some sort of session id.
+  	var random = new Random().nextInt().toString()
+  	println(random)
+  	
+    Ok(views.html.index("Ace Editor", new File("projectspace"), random))
   }
 
   
@@ -23,24 +28,4 @@ object Application extends Controller {
     
     Websocket.join(id)
   }
-  
-// def webSocket = WebSocket.async[JsValue] { request =>
-//
-//    val in = Iteratee.foreach[JsValue](Communication.commandHandling)
-//
-//    val out = Enumerator.pushee[JsValue] {
-//      pushee => pushee.push(
-//        JsObject(Seq(
-//          "type" -> JsString("editor"),
-//          "command" -> JsString("load"), 
-//          "text" -> JsString("Happy Coding!"))
-//        ).as[JsValue])
-//      Communication.out = pushee
-//    }
-//
-//    
-//
-//    Promise.pure((in,out)) 
-//  }
-
 }
