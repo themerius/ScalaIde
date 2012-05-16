@@ -8,6 +8,7 @@ import play.api.libs.json._
 object Terminal {
 
   // TODO: Refactor: make concurrent (multiuser)
+  // TODO: Need to somehow find out by itself which output channel to use.
 
   var input: java.io.OutputStream = _
   var deactivated = false
