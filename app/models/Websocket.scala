@@ -65,6 +65,15 @@ class Websocket extends Actor {
       } else {
         members = members + (id -> channel)  
         sender ! Connected(channel)
+        
+        var msg = JsObject(Seq(
+			"type" -> JsString("editor"),
+			"command" -> JsString("load"), 
+			"text" -> JsString("Happy Coding!"))
+			).as[JsValue]
+        
+        Thread.sleep(50)
+        channel.push(msg)    
       }
     }
    
