@@ -50,7 +50,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     })
         
     val deleteList = deleted.map(toSourceFile(_)).toList
-    println("")
+
     // Reload the source files that need to be updated
     val srcList = updated.map(toSourceFile(_)).toList
     
@@ -65,9 +65,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
       compiler.askLoadedTyped(source, response)
       response.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
     }
-    
-    
-    
+
     reporter.problems
   }
   
@@ -76,11 +74,13 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   	reporter.reset
   	    
     val file = toSourceFile(src)
+    println("compile")
+    println(file)
     val typedResult = new Response[compiler.Tree]
   	
   	//true is for forcereload! this is probably not needed in case of loadedsrc
-    compiler.askType(file, true, typedResult)
-
+    //compiler.askType(file, true, typedResult)
+    compiler.askLoadedTyped(file, typedResult)
     typedResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
       	
   	reporter.problems
@@ -169,7 +169,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
           
           //SISCHNEE: WRITE AN ERROR AND LOOK AT CONSOLE:
           println(formatMessage(msg))
-          
+          println(position)
           
           problems += Problem(position, formatMessage(msg), severity.id)
         }

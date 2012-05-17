@@ -46,40 +46,29 @@ IDE.htwg.Error = function($){
   };
   
   this.getCompileMessages = function(messages){
-    console.log(messages);
     var msgs = [];
-    for(var i = 0; i < messages.length; i++) {
+    for ( var i = 0; i < messages.length; i++ ) {
+      if ( IDE.htwg.editor._fileName === messages[i].source ){
         msgs.push({
             row: messages[i].row - 1,
             column: messages[i].column,
             text: messages[i].text,
             type: messages[i].type
         });
+      }
     }
-    console.log(msgs);
     return msgs;
   };
 
   this.setErrors = function(messages) {
     var errors = this.getCompileMessages(JSON.parse(messages));
+    window.aceEditor.getSession().clearAnnotations();
     window.aceEditor.getSession().setAnnotations(errors);    
   };
   
   this.showErrors = function( editor ){
     
-    
-    /*
-    editor.find(".ace_gutter-cell").each( function(index){
-      if ( that._errorList[index+1] != null ) {
-        console.log($(this));
-        console.log(JSON.stringify(that._errorList[index+1].type));
-        $(this).attr("target", String(that._errorList[index+1].type));
-      }else{
-        $(this).removeClass().addClass("ace_gutter-cell");
-      }
-    });*/
   };
-  
   
   this.init();    
 };

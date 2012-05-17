@@ -80,6 +80,8 @@ object Communication {
       case _ => "ignore"
     }
         
+    println(filePath);
+    
     //SISCHNEE: TODO: problem listbuffer is empty?!
     var probMessages: String = project.compile(filePath).map(prob => {
       "{" +

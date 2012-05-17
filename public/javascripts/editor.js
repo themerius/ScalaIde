@@ -211,8 +211,7 @@ IDE.htwg.Editor = function($){
       return;
     }
     
-    IDE.htwg.error.setErrors(data.report);
-    IDE.htwg.error.showErrors( $("#editor") );       
+    IDE.htwg.error.setErrors(data.report);    
   };
 
   this.init();    
