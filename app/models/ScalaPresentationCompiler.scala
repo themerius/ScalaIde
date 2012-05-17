@@ -115,7 +115,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
         .map(option => {
           println(option)
           val typeMember = option.asInstanceOf[compiler.TypeMember]
-          /*
+          
           println(typeMember.sym)
           println(typeMember.tpe)
           println(typeMember.asInstanceOf[compiler.TypeMember])
@@ -132,7 +132,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
           println(option.sym.infoString(option.tpe))
           println(option.sym.infosString)
           println("=====================")
-          */
+          
           
           // TODO: How do I do this using pattern matching?
           var replaceText = option.sym.decodedName.toString

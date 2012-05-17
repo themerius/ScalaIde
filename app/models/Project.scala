@@ -81,9 +81,9 @@ class Project(projectPath: String) {
   }
   
   //this is for auto-completing
-  /*def complete(filePath: String, line: Int, column: Int): Seq[PresentationCompiler.CompleteOption] = {
+  def complete(filePath: String, line: Int, column: Int): Seq[PresentationCompiler.CompleteOption] = {
     update()
-    sourceFileMap.get(filePath).map(compiler.complete(_, line, column)).getOrElse(Seq())
-  }*/
+    sourceFileMap.get(new File(filePath)).map(compiler.complete(_, line, column)).getOrElse(Seq())
+  }
   
 }

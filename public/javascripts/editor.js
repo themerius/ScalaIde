@@ -50,7 +50,7 @@ IDE.htwg.Editor = function($){
     
     evt = e || window.event;
     var keyCode = evt.keyCode;
-
+    
     //do not send message for arrowkeys, home,end,pageup,pagedown
     blockedKeyCodes = [33,34,35,36,37,38,39,40];
     
@@ -61,13 +61,25 @@ IDE.htwg.Editor = function($){
     if ( that._fileName == "" || typeof that._fileName === "undefined" ){
       return;
     }
-    
+   
     var msg = {
       "type": "editor",
       "command": "save",
       "file": that._fileName,
       "value": window.aceEditor.getSession().getValue()
     };
+    
+    // If the dot was just pressed, check for auto-complete
+    if ( keyCode === 190 ){
+      var currentPos = window.aceEditor.getCursorPosition();
+      var doc = window.aceEditor.getSession().getDocument();
+      if(currentPos.column > 0 && doc.getLine(currentPos.row).charAt(currentPos.column - 1) == '.') {
+        msg["command"] = "save-and-complete";
+        msg["row"] = currentPos.row;
+        msg["column"] = currentPos.column - 1;
+      }
+    }
+   
     IDE.htwg.websocket.sendMessage( msg );
   };
 
@@ -80,6 +92,9 @@ IDE.htwg.Editor = function($){
         break;
       case "compile":
         this.showCompileMessage(data);
+        break;
+      case "complete":
+        this.showCompleteOptions(data);
         break;
       case "remove":
         this.closeTab(data.value);
@@ -201,6 +216,16 @@ IDE.htwg.Editor = function($){
       "file": that._fileName
     };
     IDE.htwg.websocket.sendMessage( msg );
+  };
+  
+  this.showCompleteOptions = function(data){    
+    var currentPos = window.aceEditor.getCursorPosition();
+    var doc = window.aceEditor.getSession().getDocument();
+        
+    if( currentPos.column > 0 && doc.getLine(currentPos.row).charAt(currentPos.column - 1) == '.' &&
+        (currentPos.column - 1) == parseInt(data.column) && currentPos.row == parseInt(data.row) ) {
+      IDE.htwg.completer.showCompleter(data);    
+    }
   };
   
   this.showCompileMessage = function(data){

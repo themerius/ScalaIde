@@ -79,9 +79,7 @@ object Communication {
       case 2 => "error"
       case _ => "ignore"
     }
-        
-    println(filePath);
-    
+            
     //SISCHNEE: TODO: problem listbuffer is empty?!
     var probMessages: String = project.compile(filePath).map(prob => {
       "{" +
@@ -101,6 +99,29 @@ object Communication {
     ).as[JsValue]
     
   }
+  
+  def complete(filePath:String, cursorRow:Int, cursorColumn:Int): JsValue = {
+    val options = project.complete(filePath, cursorRow, cursorColumn)
+    val optionsString = options.map(o => {
+      "{" +
+        "\"kind\":\"" + o.kind + "\"," +
+        "\"name\":\"" + o.name + "\"," +
+        "\"fullName\":\"" + o.fullName + "\"," +
+        "\"replaceText\":\"" + o.replaceText + "\"," +
+        "\"cursorPos\":" + o.cursorPos + "," +
+        "\"symType\":\"" + o.symType + "\"" +
+      "}"
+    }).mkString("[", ",", "]")
+      
+    JsObject(Seq(
+      "type" -> JsString("editor"),
+      "command" -> JsString("complete"),
+      "filename" -> JsString(filePath),
+      "row" -> JsString(cursorRow.toString),
+      "column" -> JsString(cursorColumn.toString),
+      "options" -> JsString(optionsString))
+    ).as[JsValue]
+  }
 
   def commandHandling(msg: JsValue) = {
     //TODO: ERROR when js key not exists or IO Exception
@@ -113,6 +134,13 @@ object Communication {
         val value = (msg \ "value").as[String]
         save(fileName, value)
         out.push( compile( fileName ) )
+      }
+      case "save-and-complete" => {
+        val value = (msg \ "value").as[String]
+        val row = (msg \ "row").as[Int]
+        val column = (msg \ "column").as[Int]
+        save(fileName, value)
+        out.push( complete( fileName, row, column ))
       }
       case "command" => {  // Terminal command!
         val cmd = (msg \ "value").as[String]

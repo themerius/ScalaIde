@@ -1,5 +1,5 @@
 /**
-* This script loads the editor and maps function
+* This script shows error annotations in the ace editor
 *
 * @author sischnee <sischnee@gmail.com>
 * @since 2012/05/17
@@ -66,8 +66,8 @@ IDE.htwg.Error = function($){
     window.aceEditor.getSession().setAnnotations(errors);    
   };
   
+  /* could implement a little textbox with the errormsg */
   this.showErrors = function( editor ){
-    
   };
   
   this.init();    

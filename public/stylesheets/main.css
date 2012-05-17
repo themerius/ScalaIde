@@ -88,3 +88,36 @@ body {
   width: 10px;
   margin-left: 5px;
 }
+
+
+
+#auto-complete-widget {
+  display: none;
+  position: absolute;
+  overflow: auto;
+  z-index: 10;
+  background: #ffffff;
+  border: 1px solid #444444;
+  padding: 0;
+  font-size: 0.9em;
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    float: left;
+    
+    li {
+      background: #eeeeee;
+      cursor: pointer;
+      padding: 3px 3px 3px 14px;
+      background: url(/public/images/method.png) no-repeat 3px 5px;
+      display: block;
+      float: left;
+      clear: both;
+    }
+    li.selected {
+      background-color: #eeeeee;
+    }
+  }
+}
