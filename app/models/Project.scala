@@ -17,11 +17,12 @@ class Project(projectPath: String) {
   val compiler = {
   
   	//SISCHNEE: TODO: not hardcoded
-    lazy val playRoot = "D:\\play"
+   // lazy val playRoot = "D:\\play"
     
     def libDirs = {
      // val playLibs = playRoot + "/framework/sbt/"
-      val scalaLibs = "D:\\eclipse/configuration/org.eclipse.osgi/bundles/768/1/.cp/lib"
+     // val scalaLibs = "D:\\eclipse/configuration/org.eclipse.osgi/bundles/768/1/.cp/lib"
+    	val scalaLibs = "scalalibrary-2.9.1.final"
       Seq(new File(scalaLibs))
     }
           
@@ -58,7 +59,7 @@ class Project(projectPath: String) {
   def scanFiles(dir: File, regex: scala.util.matching.Regex, recurse: (File) => Boolean = {_=>true}): Seq[File] = {
     if(dir.isDirectory && recurse(dir)) {
         dir.listFiles.toSeq.collect({
-            case f if f.isFile && regex.unapplySeq(f.getName).isDefined => Seq(f.getAbsoluteFile)
+            case f if f.isFile && regex.unapplySeq(f.getName).isDefined => Seq(f)
             case f if f.isDirectory => scanFiles(f, regex)
         }).flatten
     } else {
@@ -68,15 +69,15 @@ class Project(projectPath: String) {
   
   def scanCompilableFiles(dir: File) = scanFiles(dir, "^[^.].*[.](scala|java)$".r)
   
+  //update the compiler with new or removed files
   def update() {
-    //beforeUpdate
     compiler.loadSources(sourceFiles)
   }
   
   //this is for compiling
   def compile(filePath: String): Seq[PresentationCompiler.Problem] = {
     update()
-    sourceFileMap.get(new File(new File(filePath).getAbsolutePath())).map(compiler.compile).getOrElse(Seq())
+    sourceFileMap.get(new File(filePath)).map(compiler.compile).getOrElse(Seq())
   }
   
   //this is for auto-completing

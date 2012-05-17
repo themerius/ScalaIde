@@ -48,6 +48,16 @@ IDE.htwg.Editor = function($){
 
   this.handleKey = function(e) {
     
+    evt = e || window.event;
+    var keyCode = evt.keyCode;
+
+    //do not send message for arrowkeys, home,end,pageup,pagedown
+    blockedKeyCodes = [33,34,35,36,37,38,39,40];
+    
+    if ( jQuery.inArray(keyCode, blockedKeyCodes) > -1 ){
+      return;
+    }
+
     if ( that._fileName == "" || typeof that._fileName === "undefined" ){
       return;
     }
@@ -194,7 +204,15 @@ IDE.htwg.Editor = function($){
   };
   
   this.showCompileMessage = function(data){
+    
     console.log(data);
+    
+    if ( this._fileName != data.filename ){
+      return;
+    }
+    
+    IDE.htwg.error.setErrors(data.report);
+    IDE.htwg.error.showErrors( $("#editor") );       
   };
 
   this.init();    

@@ -83,7 +83,7 @@ object Communication {
     //SISCHNEE: TODO: problem listbuffer is empty?!
     var probMessages: String = project.compile(filePath).map(prob => {
       "{" +
-      "\"source\":\"" + prob.pos.source + "\"," +
+      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
       "\"row\":" + prob.pos.line + "," +
       "\"column\":" + prob.pos.column + "," +
       "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
@@ -95,7 +95,7 @@ object Communication {
       "type" -> JsString("editor"),
       "command" -> JsString("compile"),
       "filename" -> JsString(filePath),
-      "text" -> JsString(probMessages))
+      "report" -> JsString(probMessages))
     ).as[JsValue]
     
   }
@@ -110,6 +110,7 @@ object Communication {
       case "save" => {
         val value = (msg \ "value").as[String]
         save(fileName, value)
+        out.push( compile( fileName ) )
       }
       case "command" => {  // Terminal command!
         val cmd = (msg \ "value").as[String]

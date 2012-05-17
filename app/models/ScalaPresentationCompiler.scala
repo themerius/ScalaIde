@@ -48,12 +48,16 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
       // TODO: Should I instead call askFilesDeleted?
       compiler.removeUnitOf(toSourceFile(src))
     })
-    
+        
+    val deleteList = deleted.map(toSourceFile(_)).toList
+    println("")
     // Reload the source files that need to be updated
     val srcList = updated.map(toSourceFile(_)).toList
-    println(srcList)
     
     val reloadResult = new Response[Unit]
+    
+    compiler.askFilesDeleted(deleted.map(src => toSourceFile(src)).toList, reloadResult)
+    reloadResult.get(300) orElse { throw new Exception("askFilesDeleted") }  
     compiler.askReload(srcList, reloadResult)
     
     for (source <- srcList) {
@@ -61,6 +65,8 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
       compiler.askLoadedTyped(source, response)
       response.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
     }
+    
+    
     
     reporter.problems
   }
