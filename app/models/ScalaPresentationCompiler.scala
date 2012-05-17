@@ -56,17 +56,26 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     
     val reloadResult = new Response[Unit]
     
-    compiler.askFilesDeleted(deleted.map(src => toSourceFile(src)).toList, reloadResult)
+    /*compiler.askFilesDeleted(deleted.map(src => toSourceFile(src)).toList, reloadResult)
+    
+    
     reloadResult.get(300) orElse { throw new Exception("askFilesDeleted") }  
+    
+    
     compiler.askReload(srcList, reloadResult)
     
     for (source <- srcList) {
     	val response = new Response[compiler.Tree]
       compiler.askLoadedTyped(source, response)
-      response.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
     }
+      response.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
 
     reporter.problems
+    
+    */
+    
+    compiler.askReload(srcList, reloadResult)
+    reloadResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
   }
   
   
@@ -79,8 +88,9 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     val typedResult = new Response[compiler.Tree]
   	
   	//true is for forcereload! this is probably not needed in case of loadedsrc
-    //compiler.askType(file, true, typedResult)
+  	//compiler.askType(file, false, typedResult)
     compiler.askLoadedTyped(file, typedResult)
+    
     typedResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
       	
   	reporter.problems
