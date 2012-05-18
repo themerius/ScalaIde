@@ -99,25 +99,47 @@ body {
   background: #ffffff;
   border: 1px solid #444444;
   padding: 0;
-  font-size: 0.9em;
+  font-size: 0.7em;
+  font-family: Verdana;
+}
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    float: left;
+#auto-complete-widget  ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  float: left;
+}
     
-    li {
-      background: #eeeeee;
-      cursor: pointer;
-      padding: 3px 3px 3px 14px;
-      background: url(/public/images/method.png) no-repeat 3px 5px;
-      display: block;
-      float: left;
-      clear: both;
-    }
-    li.selected {
-      background-color: #eeeeee;
-    }
-  }
+#auto-complete-widget ul li {
+  cursor: pointer;
+  padding: 3px 3px 3px 20px;
+  display: block;
+  float: left;
+  clear: both;
+}
+
+#auto-complete-widget ul li:hover {
+	background-color: #eeeeee;
+}
+
+#auto-complete-widget ul li.method {
+  background: url(../images/method.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.constructor {
+	padding: 0px 3px 3px 20px;
+  background: url(../images/constructor.png) no-repeat 3px 0px;
+}
+
+#auto-complete-widget ul li.value {
+  background: url(../images/value.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.package {
+	padding-left:23px;
+  background: url(../images/package.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.selected{
+  background-color: #eeeeee;
 }

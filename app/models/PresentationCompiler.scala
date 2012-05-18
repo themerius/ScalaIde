@@ -54,7 +54,7 @@ trait PresentationCompiler {
       loadedSrcs.remove(src)
       deleted += src
     })
-        
+       
     (updated, deleted)
   }
 
