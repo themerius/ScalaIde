@@ -127,12 +127,23 @@ body {
 }
 
 #auto-complete-widget ul li.constructor {
-	padding: 0px 3px 3px 20px;
-  background: url(../images/constructor.png) no-repeat 3px 0px;
+  background: url(../images/constructor.png) no-repeat 3px 3px;
+}
+
+#auto-complete-widget ul li.class {
+  background: url(../images/constructor.png) no-repeat 3px 3px;
 }
 
 #auto-complete-widget ul li.value {
   background: url(../images/value.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.object {
+  background: url(../images/object.png) no-repeat 3px 3px;
+}
+
+#auto-complete-widget ul li.trait {
+  background: url(../images/trait.png) no-repeat 5px 5px;
 }
 
 #auto-complete-widget ul li.package {

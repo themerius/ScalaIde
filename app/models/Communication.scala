@@ -97,7 +97,6 @@ object Communication {
       "filename" -> JsString(filePath),
       "report" -> JsString(probMessages))
     ).as[JsValue]
-    
   }
   
   def complete(filePath:String, cursorRow:Int, cursorColumn:Int): JsValue = {
@@ -105,11 +104,11 @@ object Communication {
     val optionsString = options.map(o => {
       "{" +
         "\"kind\":\"" + o.kind + "\"," +
-        "\"name\":\"" + o.name + "\"," +
-        "\"fullName\":\"" + o.fullName + "\"," +
-        "\"replaceText\":\"" + o.replaceText + "\"," +
+        "\"name\":\"" + o.name.replace("\\", "\\\\") + "\"," +
+        "\"fullName\":\"" + o.fullName.replace("\\", "\\\\") + "\"," +
+        "\"replaceText\":\"" + o.replaceText.replace("\\", "\\\\") + "\"," +
         "\"cursorPos\":" + o.cursorPos + "," +
-        "\"symType\":\"" + o.symType + "\"" +
+        "\"symType\":\"" + o.symType.replace("\\", "\\\\") + "\"" +
       "}"
     }).mkString("[", ",", "]")
       

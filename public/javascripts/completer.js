@@ -80,18 +80,22 @@ IDE.htwg.Completer = function($){
       return false;
     }
     
-    var currentPos = window.aceEditor.getCursorPosition();
- 
-
     console.log(data);
-    console.log(currentPos);
+    
+    var currentPos = window.aceEditor.getCursorPosition();
+    
+    if ( !data || !data.options ){
+      this.close();
+      return;
+    }
+    
+   // var options = JSON.parse(data.options);
     
     if(!data ||
        data.row != currentPos.row ||
        data.column != currentPos.column-1 ||
        data.options.length == 0
     ) {
-      console.log("close");
       this.close();
       return;
     }
@@ -100,25 +104,15 @@ IDE.htwg.Completer = function($){
   };
   
   this.showOptionList = function(data) {
-    var options = JSON.parse(data.options);
+    
+    var options = JSON.parse(String(data.options));
     
     this.optionList.empty();
     for(var i = 0; i < options.length; i++) {
         var option = options[i];
         var optionString = option.name + option.symType;
         var li = $('<li>' + optionString + '</li>');
-        if (option.kind == "package"){
-          li.addClass("package");
-        }
-        else if ( option.kind == "method"){
-          li.addClass("method");
-        }
-        else if ( option.kind == "value"){
-          li.addClass("value");
-        }
-        else if ( option.kind == "constructor"){
-          li.addClass("constructor");
-        }
+        li.addClass(option.kind);
         li.data('option', option);
         li.mouseover(function(){
           $(this).addClass("selected");
@@ -131,9 +125,7 @@ IDE.htwg.Completer = function($){
         });
         this.optionList.append(li);
     }
-    
-    console.log(this.optionList);
-    
+        
     var row = data.row;
     var column = data.column;
     var renderer = window.aceEditor.renderer;
@@ -306,13 +298,15 @@ IDE.htwg.Completer = function($){
       if(!option) {
         return;
       }
+      startColumn++;
       var text = option.replaceText;
       var filterText = this.getFilterText();
       var endColumn = startColumn + (filterText ? filterText.length : 0);
       widget.close();
-      doc.removeInLine(startRow, startColumn+1, endColumn);
-      doc.insertInLine({row: startRow, column: startColumn+1}, text);
-      window.aceEditor.moveCursorTo(startRow, startColumn + option.cursorPos);
+      doc.removeInLine(startRow, startColumn, endColumn);
+      doc.insertInLine({row: startRow, column: startColumn}, text);
+      //window.aceEditor.selection.moveCursorToPosition({row:startRow, column:startColumn + option.cursorPos});
+      window.aceEditor.selection.moveCursorWordRight();
     };
     
     this.init();
