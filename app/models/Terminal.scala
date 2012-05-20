@@ -52,13 +52,15 @@ object Terminal {
     if (deactivated) {
       println("Terminal-feature deactivated.")
     } else {
-      receivedKey match {
+      input.write(receivedKey)
+      input.flush()
+      /*receivedKey match {
         case 13 => {
           input.write(receivedKey)
           input.flush()
         }
         case _ => input.write(receivedKey)
-      }
+      }*/
     }
   }
 
