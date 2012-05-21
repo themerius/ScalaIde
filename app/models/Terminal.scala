@@ -8,6 +8,7 @@ import play.api.libs.json._
 object Terminal {
 
   // TODO: Refactor: make concurrent (multiuser)
+  // TODO: Need to somehow find out by itself which output channel to use.
 
   var input: java.io.OutputStream = _
   var deactivated = false
@@ -52,13 +53,15 @@ object Terminal {
     if (deactivated) {
       println("Terminal-feature deactivated.")
     } else {
-      receivedKey match {
+      input.write(receivedKey)
+      input.flush()
+      /*receivedKey match {
         case 13 => {
           input.write(receivedKey)
           input.flush()
         }
         case _ => input.write(receivedKey)
-      }
+      }*/
     }
   }
 

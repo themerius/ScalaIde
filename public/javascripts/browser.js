@@ -90,12 +90,12 @@ IDE.htwg.Browser = function($){
         }
         if ( data.rslt.obj.attr("rel") === "file" || data.rslt.obj.attr("rel") === "folder" ){
 
-          var newFileName = jQuery("#relPath").val() + "\\" + data.rslt.name;      
+          var newFileName = jQuery("#relPath").val() + "/" + data.rslt.name;      
           
           //override newfilename for folder in rename mode
           if ( $("#browserMode").val() != "create" && data.rslt.obj.attr("rel") === "folder" ){
-            var indexOfLastSlash = jQuery("#relPath").val().lastIndexOf("\\");
-            var newFileName = jQuery("#relPath").val().substring(0, indexOfLastSlash) + "\\" + data.rslt.name; 
+            var indexOfLastSlash = jQuery("#relPath").val().lastIndexOf("/");
+            var newFileName = jQuery("#relPath").val().substring(0, indexOfLastSlash) + "/" + data.rslt.name; 
             alert(newFileName);
           }
           
@@ -302,7 +302,7 @@ IDE.htwg.Browser = function($){
 
   this.getRelativePathOfObject = function(obj){
 
-    var indexOfLastSlash = obj.attr("title").lastIndexOf("\\");
+    var indexOfLastSlash = obj.attr("title").lastIndexOf("/");
         
     //we are root or folder
     if (indexOfLastSlash < 0 || obj.attr("rel") === "folder" ){
