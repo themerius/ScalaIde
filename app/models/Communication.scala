@@ -12,10 +12,10 @@ import play.api.libs.concurrent._
 
 object Communication {
 
-  var out: Enumerator.Pushee[JsValue] = _
-  
   var project: Project = _
- 
+
+  var out: PushEnumerator[JsValue] = _
+  
   def load(fileName: String): JsValue = {
     val source = scala.io.Source.fromFile(fileName)
     val lines = source.mkString
@@ -122,27 +122,30 @@ object Communication {
     ).as[JsValue]
   }
 
-  def commandHandling(message: JsValue) = {
-    val messageType = (message \ "type").as[String]
-    val command = (message \ "command").as[String]
-
-    messageType match {
-      case "editor" => editorCommandHandling(message, command)
-      case "browser" => browserCommandHandling(message, command)
-      case "terminal" => terminalCommandHandling(message, command)
-      case _ => println("Received undefined messages from websocket.")
+  def commandHandling(message: JsValue, channel: PushEnumerator[JsValue] ) = {
+    if (channel != null)
+    {
+	    val messageType = (message \ "type").as[String]
+	    val command = (message \ "command").as[String]
+	
+	    messageType match { 
+	      case "editor" => editorCommandHandling(message, command, channel)
+	      case "browser" => browserCommandHandling(message, command, channel)
+	      case "terminal" => terminalCommandHandling(message, command, channel)
+	      case _ => println("Received undefined messages from websocket.")
+	    }
     }
 
   }
 
-  def editorCommandHandling(message: JsValue, command: String) = {
+  def editorCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
     val msg = message.as[JsObject]
     var fileName = ""
     if ( msg.keys.contains("file") )
       fileName = (msg \ "file").as[String]
 
     command match {
-      case "load" => out.push(load( fileName ))
+      case "load" => channel.push(load( fileName ))
       case "save" => {
         val value = (msg \ "value").as[String]
         save(fileName, value)
@@ -162,11 +165,11 @@ object Communication {
         val folder = (msg \ "folder").as[Boolean]
         create(fileName, folder)
         if ( !folder )
-          out.push(load( fileName ))
+          channel.push(load( fileName ))
       }
       case "remove" => {
         delete(new File(fileName))
-        out.push( JsObject( Seq(
+        channel.push( JsObject( Seq(
           "type" -> JsString("editor"),
           "command" -> JsString("remove"),
           "value" -> (msg \ "list"))
@@ -178,23 +181,26 @@ object Communication {
         val folder = (msg \ "folder").as[Boolean]
         rename( oldFileName, fileName )
         if ( !folder )
-          out.push(load( fileName ))
+          channel.push(load( fileName ))
       }
-      case _ => out.push(loadError)
+      case _ => channel.push(loadError)
     }
   }
 
-  def browserCommandHandling(message: JsValue, command: String) = {
+  def browserCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
 
   }
 
-  def terminalCommandHandling(message: JsValue, command: String) = {
+  def terminalCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
+    
+    out = channel
+    
     command match {
       case "keyEvent" => {
-        val cmd = (message \ "value").as[Int]
+        val cmd = (message \ "value").as[Int] 
         Terminal.handleKey(cmd.toByte)
       }
-      case _ => out.push(loadError)
+      case _ => channel.push(loadError)
     }
   }
 

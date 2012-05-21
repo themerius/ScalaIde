@@ -1,4 +1,4 @@
-@(title: String, root: java.io.File)(implicit request: RequestHeader)
+@(title: String, root: java.io.File, id: String)(implicit request: RequestHeader)
 
 @import header._
 @import includes._
@@ -14,7 +14,7 @@
 	<script type="text/javascript">
     jQuery(document).ready(function(){
       var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-      window.webSocket = new WS("@routes.Application.webSocket.webSocketURL()");
+      window.webSocket = new WS("@routes.Application.webSocket(id).webSocketURL()");
       IDE.htwg.websocket = new IDE.htwg.Websocket(jQuery);
       IDE.htwg.websocket._websocket = window.webSocket;
       IDE.htwg.websocket._websocket.onmessage = IDE.htwg.websocket.receiveEvent;
