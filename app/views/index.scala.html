@@ -18,6 +18,9 @@
       IDE.htwg.websocket = new IDE.htwg.Websocket(jQuery);
       IDE.htwg.websocket._websocket = window.webSocket;
       IDE.htwg.websocket._websocket.onmessage = IDE.htwg.websocket.receiveEvent;
+      
+      IDE.htwg.error = new IDE.htwg.Error(jQuery);
+      IDE.htwg.completer = new IDE.htwg.Completer(jQuery);
     });
   </script>
 }

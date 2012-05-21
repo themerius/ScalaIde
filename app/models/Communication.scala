@@ -13,19 +13,20 @@ import play.api.libs.concurrent._
 object Communication {
 
   var out: Enumerator.Pushee[JsValue] = _
+  
+  var project: Project = _
  
   def load(fileName: String): JsValue = {
     val source = scala.io.Source.fromFile(fileName)
     val lines = source.mkString
     source.close()
-
+    
     JsObject(Seq(
       "type" -> JsString("editor"),
       "command" -> JsString("load"),
       "filename" -> JsString(fileName),
       "text" -> JsString(lines))
     ).as[JsValue];
-    
   }
 
   def loadError = JsObject(Seq(
@@ -70,6 +71,56 @@ object Communication {
     val these = f.listFiles
     these ++ these.filter(_.isDirectory).flatMap(recursiveListFiles)
   }
+  
+  def compile(filePath:String): JsValue = {
+  	  	
+    def getType(severity: Int) = severity match {
+      case 1 => "warning"
+      case 2 => "error"
+      case _ => "ignore"
+    }
+            
+    //SISCHNEE: TODO: problem listbuffer is empty?!
+    var probMessages: String = project.compile(filePath).map(prob => {
+      "{" +
+      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
+      "\"row\":" + prob.pos.line + "," +
+      "\"column\":" + prob.pos.column + "," +
+      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
+      "\"type\":\"" + getType(prob.severity) + "\"" +
+      "}"
+    }).mkString("[", ",", "]")
+    
+    JsObject(Seq(
+      "type" -> JsString("editor"),
+      "command" -> JsString("compile"),
+      "filename" -> JsString(filePath),
+      "report" -> JsString(probMessages))
+    ).as[JsValue]
+  }
+  
+  def complete(filePath:String, cursorRow:Int, cursorColumn:Int): JsValue = {
+    val options = project.complete(filePath, cursorRow, cursorColumn)
+    val optionsString = options.map(o => {
+      "{" +
+        "\"kind\":\"" + o.kind + "\"," +
+        "\"name\":\"" + o.name.replace("\\", "\\\\") + "\"," +
+        "\"fullName\":\"" + o.fullName.replace("\\", "\\\\") + "\"," +
+        "\"replaceText\":\"" + o.replaceText.replace("\\", "\\\\") + "\"," +
+        "\"cursorPos\":" + o.cursorPos + "," +
+        "\"symType\":\"" + o.symType.replace("\\", "\\\\") + "\"" +
+      "}"
+    }).mkString("[", ",", "]")
+      
+    JsObject(Seq(
+      "type" -> JsString("editor"),
+      "command" -> JsString("complete"),
+      "filename" -> JsString(filePath),
+      "row" -> JsString(cursorRow.toString),
+      "column" -> JsString(cursorColumn.toString),
+      "options" -> JsString(optionsString))
+    ).as[JsValue]
+  }
 
   def commandHandling(message: JsValue) = {
     val messageType = (message \ "type").as[String]
@@ -95,6 +146,17 @@ object Communication {
       case "save" => {
         val value = (msg \ "value").as[String]
         save(fileName, value)
+        out.push( compile( fileName ) )
+      }
+      case "save-and-complete" => {
+        val value = (msg \ "value").as[String]
+        val row = (msg \ "row").as[Int]
+        val column = (msg \ "column").as[Int]
+        save(fileName, value)
+        out.push( complete( fileName, row, column ))
+      }
+      case "compile" => {
+        out.push( compile( fileName ) )
       }
       case "create" => {
         val folder = (msg \ "folder").as[Boolean]
