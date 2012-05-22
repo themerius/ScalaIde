@@ -9,9 +9,6 @@ object Terminal {
   var input: java.io.OutputStream = _
   var deactivated = false
 
-  val system = ActorSystem("SendToWebsocket")
-  val websocket = system.actorOf(Props[SendToWebsocket])
-
   def start = {
     if (System.getProperty("os.name").startsWith("Windows")) {
       deactivated = true
