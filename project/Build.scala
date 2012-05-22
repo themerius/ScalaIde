@@ -9,7 +9,8 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-        "org.scala-lang" % "scala-compiler" % "2.9.1"
+        "org.scala-lang" % "scala-compiler" % "2.9.1",
+        "org.specs2" %% "specs2" % "1.10" % "test"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(

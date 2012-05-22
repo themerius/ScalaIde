@@ -10,11 +10,15 @@ import play.api.libs.iteratee._
 
 import play.api.libs.concurrent._
 
-object Communication {
+trait ICommunication {
+  var project: Project
+  var out: PushEnumerator[JsValue]
+}
 
-  var project: Project = _
+object Communication extends ICommunication {
 
-  var out: PushEnumerator[JsValue] = _
+  override var project: Project = _
+  override var out: PushEnumerator[JsValue] = _
   
   def load(fileName: String): JsValue = {
     val source = scala.io.Source.fromFile(fileName)
@@ -198,7 +202,7 @@ object Communication {
     command match {
       case "keyEvent" => {
         val cmd = (message \ "value").as[Int] 
-        Terminal.handleKey(cmd.toByte)
+        Terminal.terminal.handleKey(cmd.toByte)
       }
       case _ => channel.push(loadError)
     }
