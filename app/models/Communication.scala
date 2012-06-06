@@ -81,15 +81,23 @@ object Communication {
     }
             
     //SISCHNEE: TODO: problem listbuffer is empty?!
-    var probMessages: String = project.compile(filePath).map(prob => {
-      "{" +
-      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
-      "\"row\":" + prob.pos.line + "," +
-      "\"column\":" + prob.pos.column + "," +
-      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
-      "\"type\":\"" + getType(prob.severity) + "\"" +
-      "}"
-    }).mkString("[", ",", "]")
+    var probMessages: String = "Error"
+    
+    try {    
+	     probMessages = project.compile(filePath).map(prob => {
+	      "{" +
+	      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
+	      "\"row\":" + prob.pos.line + "," +
+	      "\"column\":" + prob.pos.column + "," +
+	      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
+	      "\"type\":\"" + getType(prob.severity) + "\"" +
+	      "}"
+	    }).mkString("[", ",", "]") 
+	}
+    
+    catch {
+      case e: Exception => println("Error in Communication.scala: " + e )  
+    }
     
     JsObject(Seq(
       "type" -> JsString("editor"),
