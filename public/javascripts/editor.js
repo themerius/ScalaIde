@@ -50,6 +50,7 @@ IDE.htwg.Editor = function($){
     
     evt = e || window.event;
     var keyCode = evt.keyCode;
+    var ctrlKey = evt.ctrlKey;
     
     //do not send message for arrowkeys, home,end,pageup,pagedown
     blockedKeyCodes = [33,34,35,36,37,38,39,40];
@@ -68,6 +69,17 @@ IDE.htwg.Editor = function($){
       "file": that._fileName,
       "value": window.aceEditor.getSession().getValue()
     };
+    
+    // If the dot was just pressed, check for auto-complete
+    if ( ctrlKey && keyCode === 32 ){
+      var currentPos = window.aceEditor.getCursorPosition();
+      var doc = window.aceEditor.getSession().getDocument();
+      {
+        msg["command"] = "save-and-complete";
+        msg["row"] = currentPos.row;
+        msg["column"] = currentPos.column - 1;
+      }
+    }
     
     // If the dot was just pressed, check for auto-complete
     if ( keyCode === 190 ){
@@ -222,8 +234,7 @@ IDE.htwg.Editor = function($){
     var currentPos = window.aceEditor.getCursorPosition();
     var doc = window.aceEditor.getSession().getDocument();
         
-    if( currentPos.column > 0 && doc.getLine(currentPos.row).charAt(currentPos.column - 1) == '.' &&
-        (currentPos.column - 1) == parseInt(data.column) && currentPos.row == parseInt(data.row) ) {
+    if((currentPos.column - 1) == parseInt(data.column) && currentPos.row == parseInt(data.row) ) {
       IDE.htwg.completer.showCompleter(data);    
     }
   };
