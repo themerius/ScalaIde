@@ -91,6 +91,7 @@ IDE.htwg.Editor = function($){
         this.compileSourceFile(data);
         break;
       case "compile":
+        console.log(data);
         this.showCompileMessage(data);
         break;
       case "complete":
@@ -229,8 +230,8 @@ IDE.htwg.Editor = function($){
   };
   
   this.showCompileMessage = function(data){
-    
-    console.log(data);
+        
+    IDE.htwg.error.setErrorFileIcons(data.report);
     
     if ( this._fileName != data.filename ){
       return;

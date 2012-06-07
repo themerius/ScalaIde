@@ -60,10 +60,36 @@ IDE.htwg.Error = function($){
     return msgs;
   };
 
+  this.getErrorSourceFiles = function(messages){
+    var errorFiles = [];
+    for ( var i = 0; i < messages.length; i++ ) {
+      errorFiles.push(messages[i].source);
+    }
+    
+    var result = [];
+    $.each(errorFiles, function(i,v){
+        if ($.inArray(v, result) == -1) result.push(v);
+    });
+    return result;
+  };
+  
+  this.setErrorFileIcons = function(messages){
+    var errorFiles = this.getErrorSourceFiles(JSON.parse(messages));
+    $("#browser").find('li').each(function(i, elem){      
+      if ( jQuery.inArray($(elem).attr("title"), errorFiles) > -1 ){
+        elemError = $('<span class="errorFile"></span>');
+        elemError.insertBefore($(elem).find('ins').first());
+      }
+      else{
+        $(elem).find('span').remove();
+      }
+    });
+  }
+  
   this.setErrors = function(messages) {
     var errors = this.getCompileMessages(JSON.parse(messages));
     window.aceEditor.getSession().clearAnnotations();
-    window.aceEditor.getSession().setAnnotations(errors);    
+    window.aceEditor.getSession().setAnnotations(errors);
   };
   
   /* could implement a little textbox with the errormsg */

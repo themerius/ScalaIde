@@ -60,6 +60,15 @@ body {
 	font-size: 11px;
 }
 
+#browser span.errorFile{
+  background: url("../images/error.gif") no-repeat 0 0px;
+  height: 20px;
+  margin-left: 17px;
+  margin-top: 4px;
+  position: absolute;
+  width: 20px;
+}
+
 .ace_scroller, .ace_gutter {
   padding-top: 3px;
 }

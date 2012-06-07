@@ -82,6 +82,7 @@ object Communication {
             
     //SISCHNEE: TODO: problem listbuffer is empty?!
     var probMessages: String = project.compile(filePath).map(prob => {
+    	println(prob)
       "{" +
       "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
       "\"row\":" + prob.pos.line + "," +
@@ -90,6 +91,10 @@ object Communication {
       "\"type\":\"" + getType(prob.severity) + "\"" +
       "}"
     }).mkString("[", ",", "]")
+    
+    println("hello")
+    
+    println(probMessages)
     
     JsObject(Seq(
       "type" -> JsString("editor"),
