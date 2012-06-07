@@ -84,8 +84,10 @@ class Websocket extends Actor {
     }
     
     case Quit(id) => {
+      members.getOrElse(id, null).close()
       members = members - id
       println(id + " disconnected!")
+      System.gc()
     }    
   }
 }
