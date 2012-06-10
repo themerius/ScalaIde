@@ -153,17 +153,17 @@ object Communication extends ICommunication {
       case "save" => {
         val value = (msg \ "value").as[String]
         save(fileName, value)
-        out.push( compile( fileName ) )
+        channel.push( compile( fileName ) )
       }
       case "save-and-complete" => {
         val value = (msg \ "value").as[String]
         val row = (msg \ "row").as[Int]
         val column = (msg \ "column").as[Int]
         save(fileName, value)
-        out.push( complete( fileName, row, column ))
+        channel.push( complete( fileName, row, column ))
       }
       case "compile" => {
-        out.push( compile( fileName ) )
+        channel.push( compile( fileName ) )
       }
       case "create" => {
         val folder = (msg \ "folder").as[Boolean]
