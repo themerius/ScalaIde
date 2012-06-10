@@ -1,26 +1,45 @@
-import org.specs2._
+import org.specs2.mutable._
 import org.specs2.mock._
 
+import play.api.libs.json._
 
-class MockitoSpec extends Specification { def is =
 
-    "A java list can be mocked"                                                    ^
-      "You can make it return a stubbed value"                                     ! c().stub^
-      "You can verify that a method was called"                                    ! c().verify^
-      "You can verify that a method was not called"                                ! c().verify2^
-                                                                                   end
-    case class c() extends Mockito {
-      val m = mock[java.util.List[String]] // a concrete class would be mocked with: mock[new java.util.LinkedList[String]]
-      def stub = {
-        m.get(0) returns "one"             // stub a method call with a return value
-        m.get(0) must_== "one"             // call the method
-      }
-      def verify = {
-        m.get(0) returns "one"             // stub a method call with a return value
-        m.get(0)                           // call the method
-        there was one(m).get(0)            // verify that the call happened
-      }
-      def verify2 = there was no(m).get(0) // verify that the call never happened
+object CommunicationMock extends Mockito {
+  val m = mock[models.ICommunication].smart
+  val inner = mock[play.api.libs.iteratee.PushEnumerator[JsValue]].smart
+  //inner.push(js) returns true
+  m.out returns inner
+}
+
+object TerminalTestConfig extends models.TerminalContext {
+  lazy val terminal = new Terminal
+  override protected val communication = CommunicationMock.m
+}
+
+
+class TerminalSpec extends Specification {
+
+  "Before the terminal is started" should {
+    "no stdin be set" in {
+      TerminalTestConfig.terminal.input must beNull
+    }
+    "it be deactivated" in {
+      TerminalTestConfig.terminal.deactivated must_== true
     }
   }
+
+  "The 'start' method" should {
+    "spawn a new terminal-bash" in {
+      TerminalTestConfig.terminal.start must beAnInstanceOf[Any]
+    }
+    "and it's deactivated on Microsoft Windows, and activated on UNIX" in {
+      if (System.getProperty("os.name").startsWith("Windows"))
+        TerminalTestConfig.terminal.deactivated must_== true
+      else
+        TerminalTestConfig.terminal.deactivated must_== false
+    }
+  }
+
+
+}
 

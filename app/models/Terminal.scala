@@ -7,17 +7,16 @@ import play.api.libs.json._
 trait TerminalContext {
   class Terminal {
 
-    // TODO: Refactor: make concurrent (multiuser)
-    // TODO: Need to somehow find out by itself which output channel to use.
-
     var input: java.io.OutputStream = _
-    var deactivated = false
+    var deactivated = true
 
     def start = {
       if (System.getProperty("os.name").startsWith("Windows")) {
         deactivated = true
-        println("This feature only available on unix, yet.")
+        println("This feature only available on unix.")
+        sendToWebsocket("This feature only available on unix.")
       } else {
+        deactivated = false
         val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
         "bash -il".run(pio)
       }
