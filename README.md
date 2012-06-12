@@ -13,6 +13,9 @@ _Run it_:
 
 `play run`
 
+_To get access to the databse_:
+'play h2-browser run'
+
 
 # Technologies
 
