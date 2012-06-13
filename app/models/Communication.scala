@@ -17,9 +17,18 @@ object Communication {
   var out: PushEnumerator[JsValue] = _
   
   def load(fileName: String): JsValue = {
-    val source = scala.io.Source.fromFile(fileName)
-    val lines = source.mkString
-    source.close()
+  
+    var lines = "Error";
+  
+    try {
+      val source = scala.io.Source.fromFile(fileName)
+      lines = source.mkString
+      source.close()
+    }
+    
+    catch {
+      case e: Exception => println("Error in Communication.scala - load(): " + e )  
+    }
     
     JsObject(Seq(
       "type" -> JsString("editor"),
@@ -36,10 +45,16 @@ object Communication {
     ).as[JsValue];
 
   def save(fileName: String, content: String) = {
-    val out = new OutputStreamWriter(
-      new FileOutputStream(fileName), "UTF-8")
-    out.write(content)
-    out.close
+    try {
+      val out = new OutputStreamWriter(
+        new FileOutputStream(fileName), "UTF-8")
+      out.write(content)
+      out.close
+    }
+    catch {
+      case e: Exception => println("Error in Communication.scala - save(): " + e )  
+    }
+    
   }
   
   def delete(file: File) : Unit = {
@@ -93,7 +108,7 @@ object Communication {
 	      "\"type\":\"" + getType(prob.severity) + "\"" +
 	      "}"
 	    }).mkString("[", ",", "]") 
-	}
+    }
     
     catch {
       case e: Exception => println("Error in Communication.scala: " + e )  
