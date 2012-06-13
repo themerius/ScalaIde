@@ -66,6 +66,8 @@ class Websocket extends Actor {
         members = members + (id -> channel)  
         sender ! Connected(channel)
         
+        println(id + " connected!")
+        
         var msg = JsObject(Seq(
 			"type" -> JsString("editor"),
 			"command" -> JsString("load"), 
@@ -82,7 +84,10 @@ class Websocket extends Actor {
     }
     
     case Quit(id) => {
+      members.getOrElse(id, null).close()
       members = members - id
+      println(id + " disconnected!")
+      System.gc()
     }    
   }
 }
