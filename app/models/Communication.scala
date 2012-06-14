@@ -126,7 +126,8 @@ object Communication extends ICommunication {
     ).as[JsValue]
   }
 
-  def commandHandling(message: JsValue, channel: PushEnumerator[JsValue] ) = {
+  def commandHandling(message: JsValue, channel: PushEnumerator[JsValue],
+    terminal: models.Terminal) = {
     if (channel != null)
     {
 	    val messageType = (message \ "type").as[String]
@@ -135,7 +136,7 @@ object Communication extends ICommunication {
 	    messageType match { 
 	      case "editor" => editorCommandHandling(message, command, channel)
 	      case "browser" => browserCommandHandling(message, command, channel)
-	      case "terminal" => terminalCommandHandling(message, command, channel)
+	      case "terminal" => terminalCommandHandling(message, command, channel, terminal)
 	      case _ => println("Received undefined messages from websocket.")
 	    }
     }
@@ -195,14 +196,14 @@ object Communication extends ICommunication {
 
   }
 
-  def terminalCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
-    
-    out = channel
+  def terminalCommandHandling(message: JsValue, command: String,
+    channel: PushEnumerator[JsValue], terminal: models.Terminal) = {
     
     command match {
       case "keyEvent" => {
         val cmd = (message \ "value").as[Int] 
-        Terminal.terminal.handleKey(cmd.toByte)
+        //Terminal.terminal.handleKey(cmd.toByte)
+        terminal.bash.handleKey(cmd.toByte)
       }
       case _ => channel.push(loadError)
     }

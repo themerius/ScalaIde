@@ -24,7 +24,7 @@ object Websocket {
   def join(id:String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     (default ? Join(id)).asPromise.map {
       
-      case Connected(enumerator) => 
+      case Connected(enumerator) => {
       
         // Create an Iteratee to consume the feed
         val iteratee = Iteratee.foreach[JsValue] { event =>
@@ -34,8 +34,9 @@ object Websocket {
         }
 
         (iteratee,enumerator)
+      }
         
-      case CannotConnect(error) => 
+      case CannotConnect(error) => {
       
         // Connection error
 
@@ -46,6 +47,7 @@ object Websocket {
         val enumerator =  Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
         
         (iteratee,enumerator)
+      }
     }
   }	
 }
@@ -53,6 +55,7 @@ object Websocket {
 class Websocket extends Actor {
   
   var members = Map.empty[String, PushEnumerator[JsValue]]
+  var terminals = Map.empty[String, models.Terminal]
   
   def receive = {
       
@@ -60,10 +63,15 @@ class Websocket extends Actor {
 
       // Create an Enumerator to write to this socket
       val channel =  Enumerator.imperative[JsValue]()
+      val terminal = new models.Terminal
+      terminal.bash.start
+      terminal.bash.setWebsocket(channel)
+
       if(members.contains(id)) {
         sender ! CannotConnect("This username is already used")
       } else {
-        members = members + (id -> channel)  
+        members = members + (id -> channel)
+        terminals = terminals + (id -> terminal)
         sender ! Connected(channel)
         
         var msg = JsObject(Seq(
@@ -78,7 +86,8 @@ class Websocket extends Actor {
     }
    
     case Talk(id, text) => {
-      Communication.commandHandling(text, members.getOrElse(id, null))
+      Communication.commandHandling(text, members.getOrElse(id, null),
+        terminals.getOrElse(id, null))
     }
     
     case Quit(id) => {

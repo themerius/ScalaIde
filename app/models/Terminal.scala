@@ -1,13 +1,16 @@
 package models
 
 import scala.sys.process._
+
+import play.api.libs.iteratee._
 import play.api.libs.json._
 
 // Cake Pattern for dependency injection
 trait TerminalContext {
-  class Terminal {
+  class Bash {
 
     var input: java.io.OutputStream = _
+    var websocket: PushEnumerator[JsValue] = _
     var deactivated = true
 
     def start = {
@@ -35,7 +38,15 @@ trait TerminalContext {
     def stderr(out: java.io.InputStream) = {
       val lines = scala.io.Source.fromInputStream(out).getLines
       def inner(str: String) = sendToWebsocket(str)
-      lines.foreach(inner)
+      try {  // TODO: unsauber, muss noch synchronisiert werden!
+        lines.foreach(inner)
+      } catch {
+        case _ => println("Terminal: Concurrent Websocket write.")
+      }
+    }
+
+    def setWebsocket(ws: PushEnumerator[JsValue]) {
+      this.websocket = ws
     }
 
     def sendToWebsocket(output: String) = this.synchronized {
@@ -45,7 +56,8 @@ trait TerminalContext {
           "value" -> JsString( output )
           )
         ).as[JsValue]
-      communication.out.push(msg)
+      //communication.out.push(msg)
+      websocket.push(msg)
     }
 
     def handleKey(receivedKey: Byte) = {
@@ -63,7 +75,7 @@ trait TerminalContext {
 
 
 // Configuration
-object Terminal extends TerminalContext {
-  lazy val terminal = new Terminal
+class Terminal extends TerminalContext {
+  lazy val bash = new Bash
   override protected val communication = Communication
 }

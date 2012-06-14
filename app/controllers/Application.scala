@@ -27,7 +27,8 @@ object Application extends Controller {
 
   
   def webSocket(id:String) = WebSocket.async[JsValue] { request  =>
-    models.Terminal.terminal.start
+    val terminal = new models.Terminal
+    terminal.bash.start
     Websocket.join(id)
   }
 }
