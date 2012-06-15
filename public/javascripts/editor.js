@@ -44,8 +44,13 @@ IDE.htwg.Editor = function($){
   */
   this.init = function() {
     $("#editor").keyup(this.handleKey);
+    $("#theme-changer").change(this.changeTheme);
   };
 
+  this.changeTheme = function(e){
+    window.aceEditor.setTheme("ace/theme/" + $("#theme-changer").val());
+  };
+  
   this.handleKey = function(e) {
     
     evt = e || window.event;
@@ -126,7 +131,8 @@ IDE.htwg.Editor = function($){
       return;
     }
     $("#editorTabs").show();
-    $("#editor").css("top", $("#editorTabs").css("height"));
+    topPosition = parseInt($("#editorTabs").css("height")) + parseInt($("#editorTabs").css("top"));
+    $("#editor").css("top", topPosition);
     
     openSourceFile = $("#editorTabs").find('span[title="'+ this._fileName +'"]')
     
@@ -134,7 +140,7 @@ IDE.htwg.Editor = function($){
     {
       shortFileName = this._fileName.substring( this._fileName.lastIndexOf("/") + 1, this._fileName.length );
       
-      tab = $('<span class="tab open" title="'+ this._fileName +'">' + shortFileName + '<a href="#" class="close">&nbsp;&nbsp;&nbsp;</a></span>');
+      tab = $('<span class="tab open" title="'+ this._fileName +'">' + shortFileName + '<a href="#" class="close" title="close">&nbsp;&nbsp;&nbsp;</a></span>');
       
       tab.click( function ( event ){
         that.openTabClickHandler(this);

@@ -12,6 +12,8 @@ object Authentication extends Controller {
 
   // -- Authentication
 
+	val title:String = "ScalaIDE"
+	
   val loginForm = Form(
     tuple(
       "email" -> text,
@@ -25,7 +27,7 @@ object Authentication extends Controller {
    * Login page.
    */
   def login = Action { implicit request =>
-    Ok(html.login(loginForm))
+    Ok(html.login(title, loginForm))
   }
 
   /**
@@ -33,7 +35,7 @@ object Authentication extends Controller {
    */
   def authenticate = Action { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.login(formWithErrors)),
+      formWithErrors => BadRequest(html.login(title, formWithErrors)),
       user => Redirect(routes.Application.index).withSession("email" -> user._1)
     )
   }

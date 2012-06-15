@@ -1,9 +1,27 @@
 @(title: String, root: java.io.File, id: String)(implicit request: RequestHeader)
 
-@import header._
+@import header.main._
 @import includes._
 
 @main(title) {
+
+  @header.main.javascripts()
+  @header.main.stylesheets()
+
+  <header>
+      <div id="left">
+        <a href="@routes.Application.index" id="logo"><span>Scala</span>IDE</a>
+      </div>
+      <div id="right">
+        <span class="username">Username</span>
+        <span>Theme: </span>
+        <select name="theme" id="theme-changer">
+          <option value="eclipse">Eclipse</option>
+          <option value="pastel_on_dark">Dark</option>
+        </select>
+        <a id="logout">Logout</a>
+      </div>
+  </header>
     
   @includes.browser(root)
 

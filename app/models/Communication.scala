@@ -24,8 +24,7 @@ object Communication {
       val source = scala.io.Source.fromFile(fileName)
       lines = source.mkString
       source.close()
-    }
-    
+    }    
     catch {
       case e: Exception => println("Error in Communication.scala - load(): " + e )  
     }

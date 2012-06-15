@@ -14,9 +14,9 @@ class Project(projectPath: String) {
   def srcDirs = Seq(root)
   
   val compiler = {
-      
-    def libDirs = {     
-        val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"                       
+  	
+  	def libDirs = {
+        val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"
         val scalaLibs = "scalalibrary-2.9.1.final"
           
         (scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r ) :+ (new File(scalaLibs)))

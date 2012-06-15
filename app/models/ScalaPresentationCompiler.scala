@@ -41,9 +41,6 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   
   override def loadSources(srcFiles: Seq[SourceFile]) = {
   	
-  	println("srcFiles")
-  	println(srcFiles)
-  	
     val (updated, deleted) = updateSources(srcFiles)
     
     // Remove the source files that have been deleted
