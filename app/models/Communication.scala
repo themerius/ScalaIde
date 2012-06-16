@@ -202,8 +202,7 @@ object Communication extends ICommunication {
     command match {
       case "keyEvent" => {
         val cmd = (message \ "value").as[Int] 
-        //Terminal.terminal.handleKey(cmd.toByte)
-        terminal.bash.handleKey(cmd.toByte)
+        terminal.handleKey(cmd.toByte)
       }
       case _ => channel.push(loadError)
     }
