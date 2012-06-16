@@ -248,6 +248,8 @@ IDE.htwg.Editor = function($){
   
   this.showCompileMessage = function(data){
         
+    IDE.htwg.error.setAllProblems(data.report);
+    IDE.htwg.error.showAllProblems();  
     IDE.htwg.error.setErrorFileIcons(data.report);
     
     if ( this._fileName != data.filename ){

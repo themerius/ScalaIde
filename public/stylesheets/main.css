@@ -1,10 +1,14 @@
+body, html {
+  height: 100%;
+}
+
 body {
-    overflow: hidden;
-    background: none repeat scroll 0 0 #F8F8FF;
-	  color: #2a3a48;
-	  font: 13px "Lucida Grande", "Helvetica Neue", sans-serif;
-	  -webkit-font-smoothing: antialised;
-	  -webkit-user-select: none;
+  overflow: hidden;
+  background: none repeat scroll 0 0 #F8F8FF;
+  color: #2a3a48;
+  font: 13px "Lucida Grande", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialised;
+  -webkit-user-select: none;
 }
 
 body  > header {
@@ -64,6 +68,7 @@ header #logout{
 	width: 45px;
 	margin-left:20px;
 	margin-right:20px;
+	text-decoration:none;
 }
 
 #editorTabs { 
@@ -79,20 +84,48 @@ header #logout{
     margin: 0;
     position: absolute;
     top: 40px;
-    bottom: 200px;
+    bottom: 290px;
     left: 300px;
     right: 0;
     border-top: 5px solid #DDDDDD;
+    border-bottom: 5px solid #DDDDDD;
 }
 
-#terminal {
+#terminalSectionTabs { 
+    height: 20px;
+    color: #f8f8ff;
+    background: none repeat scroll 0 0 #f8f8ff;
+}
+
+#terminalSectionTabs .tab{
+	background-color: #9F9F9F;
+  border: 1px solid #2C2828;
+  height: 10px;
+  margin-right: 0;
+  padding: 2px 5px;
+}
+
+#terminalSectionTabs .open{
+  background-color: #2C2828;
+}
+
+#terminalSectionContent {
     background-color: #2C2828;
-    bottom: 0;
-    height: 200px;
-    left: 300px;
-    position: absolute;
-    right: 0px;
-    color: #8F938F;
+    height: 260px;
+    overflow: auto;
+}
+
+#terminalSection{
+	  bottom: 0;
+	  left: 300px;
+	  right: 0;
+	  position:absolute;
+	  height: 280px;
+}
+
+#terminal{
+	 background-color: #2C2828;
+	 color: #8F938F;
 }
 
 #terminal-input {
@@ -100,19 +133,43 @@ header #logout{
 }
 
 #terminal textarea{
-    background: none repeat scroll 0 0 transparent;
-    border: medium none;
-    height: 200px;
-    resize: none;
-    width: 100%;
-    color: #8F938F;
-	
+  background: none repeat scroll 0 0 transparent;
+  border: medium none;
+  height: 150px;
+  resize: none;
+  width: 100%;
+  color: #8F938F;
+}
+
+#problems ul{
+	color: #f8f8ff;
+	list-style-type: none;
+	font-size: 12px;
+	padding: 10px 5px;
+}
+
+#problems li{
+  border-bottom: 1px solid #9F9F9F;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+#problems li:hover{
+	background-color: #9F9F9F;
+	cursor: pointer;
 }
 
 #browser{
 	font-family: Verdana;
 	font-size: 12px;
 	background: none repeat scroll 0 0 #F8F8FF;
+	overflow: auto;
+  padding-left:5px;
+  width:295px;
+  float:left;
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
 }
 
 #browser.jstree-classic .jstree-clicked {
@@ -149,7 +206,7 @@ header #logout{
   border: 1px solid #ddd;
   border-radius: 5px 5px 0px 0px;
   font-family: Verdana;
-  font-size: 11px;
+  font-size: 12px;
   height: 15px;
   margin: 5px 3px 0 0;
   padding: 5px 3px;
