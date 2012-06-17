@@ -31,7 +31,7 @@ interact"""
     "create a file in /tmp" in {
       val filename = ec.createFile
       filename must startWith("/tmp/ScalaIde")
-      ("ls /tmp | grep "+filename).!! must_== filename
+      ("ls /tmp").!!.contains(filename.split("/tmp/")(1)) must beTrue
     }
     "and save the filename in itself" in {
       ec.filename must startWith("/tmp/ScalaIde")
@@ -42,7 +42,7 @@ interact"""
     "delete the file generated from 'createFile'" in {
       val filename = ec.filename
       ec.delFile
-      ("ls /tmp | grep "+filename).!! must_== ""
+      ("ls /tmp").!!.contains(filename.split("/tmp/")(1)) must beFalse
     }
   }
 
