@@ -58,7 +58,6 @@ class Websocket extends Actor {
   def receive = {
 
     case Join(id) => {
-
       // Create an Enumerator to write to this socket
       val channel =  Enumerator.imperative[JsValue]()
       val terminal = new models.Terminal
@@ -72,9 +71,11 @@ class Websocket extends Actor {
         terminals = terminals + (id -> terminal)
         sender ! Connected(channel)
 
+        println(id + " connected!")
+
         var msg = JsObject(Seq(
           "type" -> JsString("editor"),
-          "command" -> JsString("load"), 
+          "command" -> JsString("load"),
           "text" -> JsString("Happy Coding!"))
         ).as[JsValue]
 
@@ -89,12 +90,14 @@ class Websocket extends Actor {
     }
 
     case Quit(id) => {
+      members.getOrElse(id, null).close()
       members = members - id
-      val terminal = this.terminals.getOrElse(id, null)
-      if (terminal != null) {
-        terminal.close
-        this.terminals = this.terminals - id
-      }
+
+      terminals.getOrElse(id, null).close
+      terminals = terminals - id
+
+      println(id + " disconnected!")
+      System.gc()
     }
   }
 }

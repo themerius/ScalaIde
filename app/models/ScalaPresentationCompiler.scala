@@ -62,20 +62,23 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     reloadResult.get(300) orElse { throw new Exception("askFilesDeleted") }  
     
     
+    
     compiler.askReload(srcList, reloadResult)
     
     for (source <- srcList) {
     	val response = new Response[compiler.Tree]
       compiler.askLoadedTyped(source, response)
     }
-      response.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
+    reloadResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
 
-    reporter.problems
-    
     */
-    
-    compiler.askReload(srcList, reloadResult)
+  	
+  	compiler.askReload(srcList, reloadResult)
+   
     reloadResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
+  	
+  	//How to wait for reloadResult finished? while( !reloadResult.isCompleted ).. does not work!
+    //Thread.sleep(500)
   }
   
   
@@ -83,16 +86,18 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   	reporter.reset
   	    
     val file = toSourceFile(src)
-    println("compile")
-    println(file)
+
     val typedResult = new Response[compiler.Tree]
   	
   	//true is for forcereload! this is probably not needed in case of loadedsrc
   	//compiler.askType(file, false, typedResult)
     compiler.askLoadedTyped(file, typedResult)
     
-    typedResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
-      	
+    typedResult.get(500) orElse{ throw new Exception("askRunLoadedTyped") }
+  	
+  	//How to wait for reloadResult finished? while( !reloadResult.isCompleted ).. does not work!
+    Thread.sleep(500)
+  	
   	reporter.problems
   }
   
@@ -113,9 +118,9 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
         //.filter(_.getClass.equals(classOf[compiler.TypeMember]))
         //.filter(_.sym.decodedName.matches("^[a-zA-Z_].*"))
         .map(option => {
-          println(option)
+          //println(option)
           val typeMember = option.asInstanceOf[compiler.TypeMember]
-          
+          /*
           println(typeMember.sym)
           println(typeMember.tpe)
           println(typeMember.asInstanceOf[compiler.TypeMember])
@@ -132,7 +137,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
           println(option.sym.infoString(option.tpe))
           println(option.sym.infosString)
           println("=====================")
-          
+          */
           
           // TODO: How do I do this using pattern matching?
           var replaceText = option.sym.decodedName.toString
@@ -158,7 +163,7 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   
   class PresentationReporter extends Reporter {
   	  	
-  	println("reporter");
+  //	println("reporter");
   	
     import PresentationReporter._
     import scala.collection.mutable.ListBuffer
@@ -178,8 +183,8 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
           
           
           //SISCHNEE: WRITE AN ERROR AND LOOK AT CONSOLE:
-          println(formatMessage(msg))
-          println(position)
+          //println(formatMessage(msg))
+          //println(position)
           
           problems += Problem(position, formatMessage(msg), severity.id)
         }

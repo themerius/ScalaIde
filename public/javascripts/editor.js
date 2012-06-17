@@ -44,12 +44,18 @@ IDE.htwg.Editor = function($){
   */
   this.init = function() {
     $("#editor").keyup(this.handleKey);
+    $("#theme-changer").change(this.changeTheme);
   };
 
+  this.changeTheme = function(e){
+    window.aceEditor.setTheme("ace/theme/" + $("#theme-changer").val());
+  };
+  
   this.handleKey = function(e) {
     
     evt = e || window.event;
     var keyCode = evt.keyCode;
+    var ctrlKey = evt.ctrlKey;
     
     //do not send message for arrowkeys, home,end,pageup,pagedown
     blockedKeyCodes = [33,34,35,36,37,38,39,40];
@@ -68,6 +74,17 @@ IDE.htwg.Editor = function($){
       "file": that._fileName,
       "value": window.aceEditor.getSession().getValue()
     };
+    
+    // If the dot was just pressed, check for auto-complete
+    if ( ctrlKey && keyCode === 32 ){
+      var currentPos = window.aceEditor.getCursorPosition();
+      var doc = window.aceEditor.getSession().getDocument();
+      {
+        msg["command"] = "save-and-complete";
+        msg["row"] = currentPos.row;
+        msg["column"] = currentPos.column - 1;
+      }
+    }
     
     // If the dot was just pressed, check for auto-complete
     if ( keyCode === 190 ){
@@ -91,6 +108,7 @@ IDE.htwg.Editor = function($){
         this.compileSourceFile(data);
         break;
       case "compile":
+        console.log(data);
         this.showCompileMessage(data);
         break;
       case "complete":
@@ -113,7 +131,8 @@ IDE.htwg.Editor = function($){
       return;
     }
     $("#editorTabs").show();
-    $("#editor").css("top", $("#editorTabs").css("height"));
+    topPosition = parseInt($("#editorTabs").css("height")) + parseInt($("#editorTabs").css("top"));
+    $("#editor").css("top", topPosition);
     
     openSourceFile = $("#editorTabs").find('span[title="'+ this._fileName +'"]')
     
@@ -121,7 +140,7 @@ IDE.htwg.Editor = function($){
     {
       shortFileName = this._fileName.substring( this._fileName.lastIndexOf("/") + 1, this._fileName.length );
       
-      tab = $('<span class="tab open" title="'+ this._fileName +'">' + shortFileName + '<a href="#" class="close">&nbsp;&nbsp;&nbsp;</a></span>');
+      tab = $('<span class="tab open" title="'+ this._fileName +'">' + shortFileName + '<a href="#" class="close" title="close">&nbsp;&nbsp;&nbsp;</a></span>');
       
       tab.click( function ( event ){
         that.openTabClickHandler(this);
@@ -222,15 +241,16 @@ IDE.htwg.Editor = function($){
     var currentPos = window.aceEditor.getCursorPosition();
     var doc = window.aceEditor.getSession().getDocument();
         
-    if( currentPos.column > 0 && doc.getLine(currentPos.row).charAt(currentPos.column - 1) == '.' &&
-        (currentPos.column - 1) == parseInt(data.column) && currentPos.row == parseInt(data.row) ) {
+    if((currentPos.column - 1) == parseInt(data.column) && currentPos.row == parseInt(data.row) ) {
       IDE.htwg.completer.showCompleter(data);    
     }
   };
   
   this.showCompileMessage = function(data){
-    
-    console.log(data);
+        
+    IDE.htwg.error.setAllProblems(data.report);
+    IDE.htwg.error.showAllProblems();  
+    IDE.htwg.error.setErrorFileIcons(data.report);
     
     if ( this._fileName != data.filename ){
       return;

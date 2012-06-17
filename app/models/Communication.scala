@@ -21,9 +21,17 @@ object Communication extends ICommunication {
   override var out: PushEnumerator[JsValue] = _
   
   def load(fileName: String): JsValue = {
-    val source = scala.io.Source.fromFile(fileName)
-    val lines = source.mkString
-    source.close()
+  
+    var lines = "Error";
+  
+    try {
+      val source = scala.io.Source.fromFile(fileName)
+      lines = source.mkString
+      source.close()
+    }    
+    catch {
+      case e: Exception => println("Error in Communication.scala - load(): " + e )  
+    }
     
     JsObject(Seq(
       "type" -> JsString("editor"),
@@ -40,10 +48,16 @@ object Communication extends ICommunication {
     ).as[JsValue];
 
   def save(fileName: String, content: String) = {
-    val out = new OutputStreamWriter(
-      new FileOutputStream(fileName), "UTF-8")
-    out.write(content)
-    out.close
+    try {
+      val out = new OutputStreamWriter(
+        new FileOutputStream(fileName), "UTF-8")
+      out.write(content)
+      out.close
+    }
+    catch {
+      case e: Exception => println("Error in Communication.scala - save(): " + e )  
+    }
+    
   }
   
   def delete(file: File) : Unit = {
@@ -83,17 +97,23 @@ object Communication extends ICommunication {
       case 2 => "error"
       case _ => "ignore"
     }
-            
-    //SISCHNEE: TODO: problem listbuffer is empty?!
-    var probMessages: String = project.compile(filePath).map(prob => {
-      "{" +
-      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
-      "\"row\":" + prob.pos.line + "," +
-      "\"column\":" + prob.pos.column + "," +
-      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
-      "\"type\":\"" + getType(prob.severity) + "\"" +
-      "}"
-    }).mkString("[", ",", "]")
+
+    var probMessages: String = "Error"
+    
+    try {    
+	     probMessages = project.compile(filePath).map(prob => {
+	      "{" +
+	      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
+	      "\"row\":" + prob.pos.line + "," +
+	      "\"column\":" + prob.pos.column + "," +
+	      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
+	      "\"type\":\"" + getType(prob.severity) + "\"" +
+	      "}"
+	    }).mkString("[", ",", "]") 
+    }
+    catch {
+      case e: Exception => println("Error in Communication.scala: " + e )  
+    }
     
     JsObject(Seq(
       "type" -> JsString("editor"),

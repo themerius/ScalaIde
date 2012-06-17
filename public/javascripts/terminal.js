@@ -12,8 +12,24 @@ IDE.htwg.Terminal = function($){
   this.init = function ( options ) {
     $("#terminal-input").keypress(this.handleKey);
     $("#terminal-input").keydown(this.handleKeyDown);
+    $("#terminalTab").click(this.openTerminal);
+    $("#problemTab").click(this.openProblems);
   };
 
+  this.openTerminal = function(e){
+    $("#problems").hide();
+    $("#problemTab").removeClass("open");
+    $("#terminal").show();
+    $("#terminalTab").addClass("open");
+  }
+  
+  this.openProblems = function(e){
+    $("#terminal").hide();
+    $("#terminalTab").removeClass("open");
+    $("#problems").show();
+    $("#problemTab").addClass("open");
+  }
+  
   this.handleKey = function(e) {
     var msg = {
       "type": "terminal",
