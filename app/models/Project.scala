@@ -2,10 +2,9 @@ package models
 
 import java.io.File
 import scala.collection.JavaConversions._
-
 import PresentationCompiler.SourceFile
-
 import java.io.{File => JFile}
+import play.api.Play
 
 
 class Project(projectPath: String) {   
@@ -15,26 +14,15 @@ class Project(projectPath: String) {
   def srcDirs = Seq(root)
   
   val compiler = {
-  
-  	//SISCHNEE: TODO: not hardcoded
-   // lazy val playRoot = "D:\\play"
-    
-    def libDirs = {
-     // val playLibs = playRoot + "/framework/sbt/"
-     // val scalaLibs = "D:\\eclipse/configuration/org.eclipse.osgi/bundles/768/1/.cp/lib"
-    	val scalaLibs = "scalalibrary-2.9.1.final"
-      Seq(new File(scalaLibs))
+  	
+  	def libDirs = {
+        val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"
+        val scalaLibs = "scalalibrary-2.9.1.final"
+          
+        (scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r ) :+ (new File(scalaLibs)))
     }
           
-    val allJars = {
-      val libJars = libDirs.map(libDir => libDir.listFiles(
-      		new java.io.FilenameFilter {
-        override def accept(dir: File, name: String) = {name.endsWith(".jar")}
-      })).flatten
-      libJars
-    }
-
-    new ScalaPresentationCompiler(sourceFiles, allJars)
+    new ScalaPresentationCompiler(sourceFiles, libDirs)
   }
     // Map of original java.io.File => its representation as a PresentationCompiler.SourceFile
   lazy val sourceFileMap = new scala.collection.mutable.HashMap[File, SourceFile]
@@ -85,5 +73,5 @@ class Project(projectPath: String) {
     update()
     sourceFileMap.get(new File(filePath)).map(compiler.complete(_, line, column)).getOrElse(Seq())
   }
-  
+    
 }

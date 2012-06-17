@@ -1,22 +1,72 @@
 package models
 
 import scala.sys.process._
+import java.io.{OutputStreamWriter, FileOutputStream}
 
+import play.api.libs.iteratee._
 import play.api.libs.json._
 
-object Terminal {
+class ExpectScript {
+
+  var filename: String = _
+  var str: String = _
+
+  def generateStr(user: String, url: String, passw: String): String = {
+    var str = """#!/usr/bin/expect -f
+
+spawn ssh %s@%s
+expect "%s@%s's password:"
+send "%s\n"
+interact""".format(user, url, user, url, passw)
+    this.str = str
+    return str
+  }
+
+  def createFile: String = {
+    val filename = java.util.UUID.randomUUID()
+    this.filename = "/tmp/ScalaIde" + filename.toString
+
+    val file = new OutputStreamWriter(
+      new FileOutputStream(this.filename), "UTF-8")
+    file.append(this.str)
+    file.close
+
+    return this.filename
+  }
+
+  def delFile = ("rm " + this.filename).!
+}
+
+// Cake Pattern for dependency injection
+class Terminal {
 
   var input: java.io.OutputStream = _
-  var deactivated = false
+  var websocket: PushEnumerator[JsValue] = _
+  var deactivated = true
 
   def start = {
     if (System.getProperty("os.name").startsWith("Windows")) {
       deactivated = true
-      println("This feature only available on unix, yet.")
+
+      println("This feature only available on unix.")
+      sendToWebsocket("This feature only available on unix.")
     } else {
+      deactivated = false
+
+      val expectScript = new ExpectScript
+      expectScript.generateStr("terminal", "141.37.31.235", "")
+      val scriptPath = expectScript.createFile
+
       val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
-      "bash -il".run(pio)
+      ("expect -f " + scriptPath).run(pio)
+
+      expectScript.delFile
     }
+  }
+
+  def close = {
+    //this.handleKey("4".toByte)
+    this.input.close()
   }
 
   def stdin(in: java.io.OutputStream) = {
@@ -25,7 +75,7 @@ object Terminal {
 
   def stdout(out: java.io.InputStream) = {
     val lines = scala.io.Source.fromInputStream(out).getLines
-    def inner(str: String) = sendToWebsocket("    " + str)
+    def inner(str: String) = sendToWebsocket(str)
     lines.foreach(inner)
   }
 
@@ -35,6 +85,10 @@ object Terminal {
     lines.foreach(inner)
   }
 
+  def setWebsocket(ws: PushEnumerator[JsValue]) {
+    this.websocket = ws
+  }
+
   def sendToWebsocket(output: String) = this.synchronized {
     val msg = JsObject( Seq(
         "type" -> JsString("terminal"),
@@ -42,7 +96,7 @@ object Terminal {
         "value" -> JsString( output )
         )
       ).as[JsValue]
-    Communication.out.push(msg)
+    websocket.push(msg)
   }
 
   def handleKey(receivedKey: Byte) = {
@@ -53,5 +107,4 @@ object Terminal {
       input.flush()
     }
   }
-
 }

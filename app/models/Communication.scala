@@ -10,16 +10,28 @@ import play.api.libs.iteratee._
 
 import play.api.libs.concurrent._
 
-object Communication {
+trait ICommunication {
+  var project: Project
+  var out: PushEnumerator[JsValue]
+}
 
-  var project: Project = _
+object Communication extends ICommunication {
 
-  var out: PushEnumerator[JsValue] = _
+  override var project: Project = _
+  override var out: PushEnumerator[JsValue] = _
   
   def load(fileName: String): JsValue = {
-    val source = scala.io.Source.fromFile(fileName)
-    val lines = source.mkString
-    source.close()
+  
+    var lines = "Error";
+  
+    try {
+      val source = scala.io.Source.fromFile(fileName)
+      lines = source.mkString
+      source.close()
+    }    
+    catch {
+      case e: Exception => println("Error in Communication.scala - load(): " + e )  
+    }
     
     JsObject(Seq(
       "type" -> JsString("editor"),
@@ -36,10 +48,16 @@ object Communication {
     ).as[JsValue];
 
   def save(fileName: String, content: String) = {
-    val out = new OutputStreamWriter(
-      new FileOutputStream(fileName), "UTF-8")
-    out.write(content)
-    out.close
+    try {
+      val out = new OutputStreamWriter(
+        new FileOutputStream(fileName), "UTF-8")
+      out.write(content)
+      out.close
+    }
+    catch {
+      case e: Exception => println("Error in Communication.scala - save(): " + e )  
+    }
+    
   }
   
   def delete(file: File) : Unit = {
@@ -79,17 +97,23 @@ object Communication {
       case 2 => "error"
       case _ => "ignore"
     }
-            
-    //SISCHNEE: TODO: problem listbuffer is empty?!
-    var probMessages: String = project.compile(filePath).map(prob => {
-      "{" +
-      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
-      "\"row\":" + prob.pos.line + "," +
-      "\"column\":" + prob.pos.column + "," +
-      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
-      "\"type\":\"" + getType(prob.severity) + "\"" +
-      "}"
-    }).mkString("[", ",", "]")
+
+    var probMessages: String = "Error"
+    
+    try {    
+	     probMessages = project.compile(filePath).map(prob => {
+	      "{" +
+	      "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
+	      "\"row\":" + prob.pos.line + "," +
+	      "\"column\":" + prob.pos.column + "," +
+	      "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
+	      "\"type\":\"" + getType(prob.severity) + "\"" +
+	      "}"
+	    }).mkString("[", ",", "]") 
+    }
+    catch {
+      case e: Exception => println("Error in Communication.scala: " + e )  
+    }
     
     JsObject(Seq(
       "type" -> JsString("editor"),
@@ -122,7 +146,8 @@ object Communication {
     ).as[JsValue]
   }
 
-  def commandHandling(message: JsValue, channel: PushEnumerator[JsValue] ) = {
+  def commandHandling(message: JsValue, channel: PushEnumerator[JsValue],
+    terminal: models.Terminal) = {
     if (channel != null)
     {
 	    val messageType = (message \ "type").as[String]
@@ -131,7 +156,7 @@ object Communication {
 	    messageType match { 
 	      case "editor" => editorCommandHandling(message, command, channel)
 	      case "browser" => browserCommandHandling(message, command, channel)
-	      case "terminal" => terminalCommandHandling(message, command, channel)
+	      case "terminal" => terminalCommandHandling(message, command, channel, terminal)
 	      case _ => println("Received undefined messages from websocket.")
 	    }
     }
@@ -191,14 +216,13 @@ object Communication {
 
   }
 
-  def terminalCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
-    
-    out = channel
+  def terminalCommandHandling(message: JsValue, command: String,
+    channel: PushEnumerator[JsValue], terminal: models.Terminal) = {
     
     command match {
       case "keyEvent" => {
         val cmd = (message \ "value").as[Int] 
-        Terminal.handleKey(cmd.toByte)
+        terminal.handleKey(cmd.toByte)
       }
       case _ => channel.push(loadError)
     }
