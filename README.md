@@ -2,7 +2,7 @@
 
 Is a web-based IDE for the Scala Language. For the frontend html5 is used, especially websockets in the backend the play framework is used, which is implemented in Scala.
 
-It is originated as a teamproject at the department of computer science at University of Applied Sciences, Constance, Germany.
+It is originated as a teamproject at the department of computer science at [University of Applied Sciences, Constance, Germany](http://www.htwg-konstanz.de/).
 
 Thanks to [Dirk](https://github.com/dirkmc/ph), he had previously implemented the compiler-thing. We ported it to Play 2.0.
 
@@ -19,9 +19,9 @@ Thanks to [Dirk](https://github.com/dirkmc/ph), he had previously implemented th
 
 **Used technologies**:
 
-  * HTML5 websocket
-  * AceEditor
-  * jsTree
+  * [HTML5 websocket](http://www.w3.org/TR/websockets/)
+  * [AceEditor](http://ace.ajax.org/)
+  * [jsTree](http://www.jstree.com/)
   * [Typesafe Stack](http://typesafe.com/stack/download)
   * [Play Framework 2.0](http://www.playframework.org/documentation/2.0/Installing)
 
@@ -73,7 +73,7 @@ Click something here and click something there…
 Change in `conf/application.conf` the variable `framework.directory` to the play-main-folder.
 
 ```
-git clone git@github.com:themerius/ScalaIde.git
+git clone git://github.com/themerius/ScalaIde.git
 cd ScalaIde
 play run
 ```
