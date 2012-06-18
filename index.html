@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>ScalaIde by themerius</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>ScalaIde</h1>
+        <p>Html5 based Scala IDE with Play Framework</p>
+        <p class="view"><a href="https://github.com/themerius/ScalaIde">View the Project on GitHub <small>themerius/ScalaIde</small></a></p>
+        <ul>
+          <li><a href="https://github.com/themerius/ScalaIde/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/themerius/ScalaIde/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/themerius/ScalaIde">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>ScalaIde</h1>
+
+<p>Is a web-based IDE for the Scala Language. For the frontend html5 is used, especially websockets in the backend the play framework is used, which is implemented in Scala.</p>
+
+<p>It is originated as a teamproject at the department of computer science at <a href="http://www.htwg-konstanz.de/">University of Applied Sciences, Constance, Germany</a>.</p>
+
+<p>Thanks to <a href="https://github.com/dirkmc/ph">Dirk</a>, he had previously implemented the compiler-thing. We ported it to Play 2.0.</p>
+
+<p><img src="https://lh3.googleusercontent.com/-WKTbRBZ009k/T98xE8BcA-I/AAAAAAAAAHY/bWuPr5fQxjE/s800/scalaide.png" alt="ScalaIde Screenshot"></p>
+
+<p><strong>Features</strong>:</p>
+
+<ul>
+<li>Multiple users</li>
+<li>Each users has a project</li>
+<li>Automatic compiling for error detection and notice</li>
+<li>File tree</li>
+<li>Editor</li>
+<li>Terminal-Shell (ssh connection)</li>
+</ul><p><strong>Used technologies</strong>:</p>
+
+<ul>
+<li><a href="http://www.w3.org/TR/websockets/">HTML5 websocket</a></li>
+<li><a href="http://ace.ajax.org/">AceEditor</a></li>
+<li><a href="http://www.jstree.com/">jsTree</a></li>
+<li><a href="http://typesafe.com/stack/download">Typesafe Stack</a></li>
+<li><a href="http://www.playframework.org/documentation/2.0/Installing">Play Framework 2.0</a></li>
+</ul><p>This project is optimized for running on UNIX and UNIXlike systems -- especially for the Terminal feature. If you run it on Windows, the Terminal will be deactivated.</p>
+
+<h2>Installation</h2>
+
+<p>Steps to do, before you can run ScalaIde.</p>
+
+<h3>Mac OS X</h3>
+
+<p>Instructions for installing <a href="http://mxcl.github.com/homebrew/">Homebrew</a>.</p>
+
+<p>Instructions for installing <a href="http://typesafe.com/stack/download">Scala</a>.</p>
+
+<pre><code>brew install scala sbt maven giter8
+brew install play
+</code></pre>
+
+<h3>Debian or Ubuntu</h3>
+
+<p>Instructions for installing <a href="http://typesafe.com/stack/download">Scala</a>.</p>
+
+<pre><code>wget http://apt.typesafe.com/repo-deb-build-0002.deb
+dpkg --install repo-deb-build-0002.deb 
+apt-get update
+apt-get install typesafe-stack
+apt-get install openjdk-6-jdk  # we need also javac!
+</code></pre>
+
+<p><a href="http://www.playframework.org/download">Play Framkework Download</a></p>
+
+<pre><code>cd ~
+wget http://download.playframework.org/releases/play-2.0.1.zip
+unzip play-2.0.1.zip
+# add play to your PATH, via default $HOME/bin is already in your PATH
+mkdir bin
+ln -s $HOME/play-2.0.1/play bin/play
+</code></pre>
+
+<h3>Windows</h3>
+
+<p>Click something here and click something there…</p>
+
+<h2>Run It</h2>
+
+<p>Change in <code>conf/application.conf</code> the variable <code>framework.directory</code> to the play-main-folder.</p>
+
+<pre><code>git clone git://github.com/themerius/ScalaIde.git
+cd ScalaIde
+play run
+</code></pre>
+
+<p>Open your websocket-ready browser at <code>http://localhost:9000</code>.</p>
+
+<p>You will be asked if you want to create the bootstrap database, with three default users:</p>
+
+<ul>
+<li>
+<a href="mailto:lars@test.de">lars@test.de</a>, password = 123</li>
+<li>
+<a href="mailto:sven@test.de">sven@test.de</a>, password = 123</li>
+<li>
+<a href="mailto:simon@test.de">simon@test.de</a>, password = 123</li>
+</ul><p>If you want to create the database direcly, call play like this:</p>
+
+<pre><code>play -DapplyEvolutions.default=true start
+</code></pre>
+
+<p><em>To manage the databse</em>:</p>
+
+<pre><code>play h2-browser run
+</code></pre>
+
+<h2>Work to do</h2>
+
+<p>There is also work to do...</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/themerius">themerius</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
