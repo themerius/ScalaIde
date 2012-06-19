@@ -66,7 +66,8 @@ class Terminal {
 
   def close = {
     //this.handleKey("4".toByte)
-    this.input.close()
+    if (!deactivated)
+      this.input.close()
   }
 
   def stdin(in: java.io.OutputStream) = {
