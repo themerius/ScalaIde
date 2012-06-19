@@ -1,4 +1,4 @@
-@(title: String, root: java.io.File, id: String)(implicit request: RequestHeader)
+@(title: String, root: java.io.File, id: String, user: String)(implicit request: RequestHeader)
 
 @import header.main._
 @import includes._
@@ -13,7 +13,7 @@
         <a href="@routes.Application.index" id="logo"><span>Scala</span>IDE</a>
       </div>
       <div id="right">
-        <span class="username">Username</span>
+        <span class="username">@user</span>
         <span>Theme: </span>
         <select name="theme" id="theme-changer">
           <option value="eclipse">Eclipse</option>

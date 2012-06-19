@@ -3,13 +3,13 @@
 # --- !Ups
  
 INSERT INTO USER (email, password, fullname, isAdmin, projectpath)
-VALUES('lars@test.de', '123', 'lars', 0, 'projectspaces/lars');
+VALUES('lars@test.de', '123', 'lars', 0, 'lars');
 
 INSERT INTO USER (email, password, fullname, isAdmin, projectpath)
-VALUES('sven@test.de', '123', 'sven', 0, 'projectspaces/sven');
+VALUES('sven@test.de', '123', 'sven', 0, 'sven');
 
 INSERT INTO USER (email, password, fullname, isAdmin, projectpath)
-VALUES('simon@test.de', '123', 'simon', 0, 'projectspaces/simon');
+VALUES('simon@test.de', '123', 'simon', 0, 'simon');
  
 # --- !Downs
  
