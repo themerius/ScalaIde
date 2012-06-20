@@ -17,14 +17,18 @@ class Project(projectPath: String) {
   	
   	def libDirs = {
         val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"
-        val scalaLibs = "scalalibrary-2.9.1.final"
+        val userLibs = projectPath + "/lib_managed"
+                
+        var allLibs = scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r )
+        
+        for(file <- scanFiles(new File(userLibs), "^[^.].*[.](jar)$".r ))
+          allLibs = allLibs :+ file
           
-        (scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r ) :+ (new File(scalaLibs)))
-    }
-          
+        (allLibs)
+    }    
     new ScalaPresentationCompiler(sourceFiles, libDirs)
   }
-    // Map of original java.io.File => its representation as a PresentationCompiler.SourceFile
+  // Map of original java.io.File => its representation as a PresentationCompiler.SourceFile
   lazy val sourceFileMap = new scala.collection.mutable.HashMap[File, SourceFile]
         
   def sourceFiles = {
@@ -39,7 +43,7 @@ class Project(projectPath: String) {
     }).flatten.toSeq
   }
   
-    //
+  //
   // Get a list of all files in the given directory, with file name filtered by
   // regex. The recurse function indicates whether to recurse into a directory
   // or not.
