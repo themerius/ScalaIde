@@ -44,12 +44,20 @@ class Terminal {
   var websocket: PushEnumerator[JsValue] = _
   var deactivated = true
 
-  def start = {
+  def start(public: Boolean) = {
     if (System.getProperty("os.name").startsWith("Windows")) {
       deactivated = true
 
       println("This feature only available on unix.")
       sendToWebsocket("This feature only available on unix.")
+    } else if (public) {
+      deactivated = true
+      
+      println("User is public: " + public)
+
+      println("This feature is only available for certain user.")
+      sendToWebsocket("This feature is only available for certain user.")
+    
     } else {
       deactivated = false
 

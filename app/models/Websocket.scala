@@ -62,7 +62,10 @@ class Websocket extends Actor {
       val channel =  Enumerator.imperative[JsValue]()
       val terminal = new models.Terminal
       terminal.setWebsocket(channel)
-      terminal.start
+      
+      User.findById(id).map { user =>
+        terminal.start(user.public)
+      }
 
       if(members.contains(id)) {
         sender ! CannotConnect("This username is already used")
