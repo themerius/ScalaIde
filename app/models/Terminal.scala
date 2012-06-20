@@ -44,31 +44,32 @@ class Terminal {
   var websocket: PushEnumerator[JsValue] = _
   var deactivated = true
 
-  def start(public: Boolean) = {
-    if (System.getProperty("os.name").startsWith("Windows")) {
-      deactivated = true
+  def start(id: String) = {
+  
+    User.findById(id).map { user =>
+      if (System.getProperty("os.name").startsWith("Windows")) {
+        deactivated = true
 
-      println("This feature only available on unix.")
-      sendToWebsocket("This feature only available on unix.")
-    } else if (public) {
-      deactivated = true
+        println("This feature only available on unix.")
+        sendToWebsocket("This feature only available on unix.")
+      } else if (user.public) {
+        deactivated = true
+
+        println("This feature is only available for certain user.")
+        sendToWebsocket("This feature is only available for certain user.")
       
-      println("User is public: " + public)
+      } else {
+        deactivated = false
 
-      println("This feature is only available for certain user.")
-      sendToWebsocket("This feature is only available for certain user.")
-    
-    } else {
-      deactivated = false
+        val expectScript = new ExpectScript
+        expectScript.generateStr("terminal", "141.37.31.235", "")
+        val scriptPath = expectScript.createFile
 
-      val expectScript = new ExpectScript
-      expectScript.generateStr("terminal", "141.37.31.235", "")
-      val scriptPath = expectScript.createFile
+        val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
+        ("expect -f " + scriptPath).run(pio)
 
-      val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
-      ("expect -f " + scriptPath).run(pio)
-
-      expectScript.delFile
+        expectScript.delFile
+      }
     }
   }
 
