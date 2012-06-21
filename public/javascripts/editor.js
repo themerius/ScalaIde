@@ -45,6 +45,13 @@ IDE.htwg.Editor = function($){
   this.init = function() {
     $("#editor").keyup(this.handleKey);
     $("#theme-changer").change(this.changeTheme);
+    
+    try{
+      firstFile = $("#browser").find("li").filter(function () {
+        var $el = $(this);
+        return $el.attr("rel") == "file"}).first();
+      window.setTimeout(function() { that.compileSourceFile({"filename": firstFile.attr("title")}) }, 500);
+    }catch(e){}
   };
 
   this.changeTheme = function(e){
@@ -108,7 +115,6 @@ IDE.htwg.Editor = function($){
         this.compileSourceFile(data);
         break;
       case "compile":
-        console.log(data);
         this.showCompileMessage(data);
         break;
       case "complete":
@@ -123,6 +129,7 @@ IDE.htwg.Editor = function($){
   
   this.loadSourceFile = function(data){
     window.aceEditor.getSession().setValue(data.text);
+    window.aceEditor.getSession().clearAnnotations();
     
     this._fileName = data.filename;
     
@@ -225,6 +232,14 @@ IDE.htwg.Editor = function($){
     this._fileName = data.filename;
     
     if ( this._fileName == "" || typeof this._fileName === "undefined" ){
+      this._fileName = "";
+      return;
+    }
+    
+    var extension = this._fileName.substr( (this._fileName.lastIndexOf('.') +1) );
+    
+    if ( extension != 'scala' )
+    {
       this._fileName = "";
       return;
     }

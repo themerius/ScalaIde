@@ -31,6 +31,8 @@ IDE.htwg.Websocket = function($){
     if(data.error) {
       //$("#onError span").text(data.error)
       //$("#onError").show()
+      
+      //alert(data.text)
       alert("Error");
       return;
     }

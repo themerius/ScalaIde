@@ -118,7 +118,6 @@ IDE.htwg.Error = function($){
   this.setErrors = function(messages) {
     try{
       var errors = this.getCompileMessages(JSON.parse(messages));
-      window.aceEditor.getSession().clearAnnotations();
       window.aceEditor.getSession().setAnnotations(errors);
     }catch(e){}
   };
