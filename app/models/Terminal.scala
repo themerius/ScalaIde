@@ -43,33 +43,28 @@ class Terminal {
   var input: java.io.OutputStream = _
   var websocket: PushEnumerator[JsValue] = _
   var deactivated = true
+  var publicUser = false
 
-  def start(id: String) = {
-  
-    User.findById(id).map { user =>
-      if (System.getProperty("os.name").startsWith("Windows")) {
-        deactivated = true
+  def start = {
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      deactivated = true
 
-        println("This feature only available on unix.")
-        sendToWebsocket("This feature only available on unix.")
-      } else if (user.public) {
-        deactivated = true
+      println("This feature only available on unix.")
+      sendToWebsocket("This feature only available on unix.")
+    } else if (publicUser) {
+      println("This feature is only available for certain user.")
+      sendToWebsocket("This feature is only available for certain user.")
+    } else {
+      deactivated = false
 
-        println("This feature is only available for certain user.")
-        sendToWebsocket("This feature is only available for certain user.")
-      
-      } else {
-        deactivated = false
+      val expectScript = new ExpectScript
+      expectScript.generateStr("terminal", "141.37.31.235", "")
+      val scriptPath = expectScript.createFile
 
-        val expectScript = new ExpectScript
-        expectScript.generateStr("terminal", "141.37.31.235", "")
-        val scriptPath = expectScript.createFile
+      val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
+      ("expect -f " + scriptPath).run(pio)
 
-        val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
-        ("expect -f " + scriptPath).run(pio)
-
-        expectScript.delFile
-      }
+      expectScript.delFile
     }
   }
 
@@ -77,6 +72,16 @@ class Terminal {
     //this.handleKey("4".toByte)
     if (!deactivated)
       this.input.close()
+  }
+
+  def deactivateIfPublic(userId: String) = {
+    User.findById(userId).map { user =>
+      if (user.public) {
+        publicUser = true
+      } else {
+        publicUser = false
+      }
+    }
   }
 
   def stdin(in: java.io.OutputStream) = {
