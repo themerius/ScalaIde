@@ -79,3 +79,10 @@ class Project(projectPath: String) {
   }
     
 }
+
+
+class SbtProject(val path: String) {
+  def isExistent = false
+  def doBootstrap = false
+  def update = false
+}
