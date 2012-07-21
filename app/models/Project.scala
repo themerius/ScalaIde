@@ -5,6 +5,7 @@ import scala.collection.JavaConversions._
 import PresentationCompiler.SourceFile
 import java.io.{File => JFile}
 import play.api.Play
+import scala.sys.process._
 
 
 class Project(projectPath: String) {   
@@ -82,7 +83,36 @@ class Project(projectPath: String) {
 
 
 class SbtProject(val path: String) {
-  def isExistent = false
-  def doBootstrap = false
-  def update = false
+  def isExistent: Boolean = (new File(path + "/build.sbt")).exists
+
+  def buildSbtContent: String = {
+    "name := \"ScalaIde Default Project\"\n\n" +
+    "version := \"0.1\"\n\n" +
+    "scalaVersion := \"2.9.1\"\n\n" +
+    "libraryDependencies += \"org.specs2\" %%" +
+      "\"specs2\" % \"1.11\" % \"test\"\n\n" +
+    "retrieveManaged := true"
+  }
+
+  def doBootstrap: Boolean = {
+    val file = new java.io.BufferedWriter(
+      new java.io.FileWriter(path + "/build.sbt")
+    )
+    try {
+      file.write(buildSbtContent)
+      file.close()
+      return true
+    } catch {
+      case e: Exception => return false
+    }
+  }
+
+  def update = {
+    val program = new java.util.ArrayList[String]()
+    program.add("sbt")
+    program.add("update")  // Argument
+    val javaProcess = new java.lang.ProcessBuilder(program)
+    javaProcess.directory(new File(path))
+    javaProcess.start()
+  }
 }
