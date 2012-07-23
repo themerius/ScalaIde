@@ -112,7 +112,7 @@ object Communication extends ICommunication {
 	    }).mkString("[", ",", "]") 
     }
     catch {
-      case e: Exception => println("Error in Communication.scala: " + e )  
+      case e: Exception => println("Error in compile Communication.scala: " + e )  
     }
     
     JsObject(Seq(
@@ -124,17 +124,26 @@ object Communication extends ICommunication {
   }
   
   def complete(filePath:String, cursorRow:Int, cursorColumn:Int): JsValue = {
-    val options = project.complete(filePath, cursorRow, cursorColumn)
-    val optionsString = options.map(o => {
-      "{" +
-        "\"kind\":\"" + o.kind + "\"," +
-        "\"name\":\"" + o.name.replace("\\", "\\\\") + "\"," +
-        "\"fullName\":\"" + o.fullName.replace("\\", "\\\\") + "\"," +
-        "\"replaceText\":\"" + o.replaceText.replace("\\", "\\\\") + "\"," +
-        "\"cursorPos\":" + o.cursorPos + "," +
-        "\"symType\":\"" + o.symType.replace("\\", "\\\\") + "\"" +
-      "}"
-    }).mkString("[", ",", "]")
+    
+    var options: Seq[PresentationCompiler.CompleteOption] = null
+    
+    try {  
+      options = project.complete(filePath, cursorRow, cursorColumn)
+    } catch {
+      case e: Exception => println("Error in complete Communication.scala: " + e )  
+    }
+      val optionsString = options.map(o => {
+        "{" +
+          "\"kind\":\"" + o.kind + "\"," +
+          "\"name\":\"" + o.name.replace("\\", "\\\\") + "\"," +
+          "\"fullName\":\"" + o.fullName.replace("\\", "\\\\") + "\"," +
+          "\"replaceText\":\"" + o.replaceText.replace("\\", "\\\\") + "\"," +
+          "\"cursorPos\":" + o.cursorPos + "," +
+          "\"symType\":\"" + o.symType.replace("\\", "\\\\") + "\"" +
+        "}"
+      }).mkString("[", ",", "]")
+
+
       
     JsObject(Seq(
       "type" -> JsString("editor"),
@@ -146,55 +155,51 @@ object Communication extends ICommunication {
     ).as[JsValue]
   }
 
-  def commandHandling(message: JsValue, channel: PushEnumerator[JsValue],
+  def commandHandling(message: JsValue, id:String,
     terminal: models.Terminal) = {
-    if (channel != null)
-    {
-	    val messageType = (message \ "type").as[String]
-	    val command = (message \ "command").as[String]
+    val messageType = (message \ "type").as[String]
+    val command = (message \ "command").as[String]
 	
-	    messageType match { 
-	      case "editor" => editorCommandHandling(message, command, channel)
-	      case "browser" => browserCommandHandling(message, command, channel)
-	      case "terminal" => terminalCommandHandling(message, command, channel, terminal)
-	      case _ => println("Received undefined messages from websocket.")
-	    }
+    messageType match { 
+      case "editor" => editorCommandHandling(message, command, id)
+      case "browser" => browserCommandHandling(message, command, id)
+      case "terminal" => terminalCommandHandling(message, command, id, terminal)
+      case _ => println("Received undefined messages from websocket.")
     }
-
   }
 
-  def editorCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
+  def editorCommandHandling(message: JsValue, command: String, id:String) = {
     val msg = message.as[JsObject]
     var fileName = ""
     if ( msg.keys.contains("file") )
       fileName = (msg \ "file").as[String]
 
     command match {
-      case "load" => channel.push(load( fileName ))
+      case "load" => models.Websocket.send(id,load( fileName ))
       case "save" => {
         val value = (msg \ "value").as[String]
         save(fileName, value)
-        channel.push( compile( fileName ) )
+        models.Websocket.send(id, compile( fileName ) )
       }
       case "save-and-complete" => {
         val value = (msg \ "value").as[String]
         val row = (msg \ "row").as[Int]
         val column = (msg \ "column").as[Int]
         save(fileName, value)
-        channel.push( complete( fileName, row, column ))
+        models.Websocket.send(id, complete( fileName, row, column ))
       }
       case "compile" => {
-        channel.push( compile( fileName ) )
+        models.Websocket.send(id, compile( fileName ) )
       }
       case "create" => {
         val folder = (msg \ "folder").as[Boolean]
         create(fileName, folder)
         if ( !folder )
-          channel.push(load( fileName ))
+          models.Websocket.send(id,load( fileName ))
       }
       case "remove" => {
         delete(new File(fileName))
-        channel.push( JsObject( Seq(
+        models.Websocket.send(id, JsObject( Seq(
           "type" -> JsString("editor"),
           "command" -> JsString("remove"),
           "value" -> (msg \ "list"))
@@ -206,25 +211,25 @@ object Communication extends ICommunication {
         val folder = (msg \ "folder").as[Boolean]
         rename( oldFileName, fileName )
         if ( !folder )
-          channel.push(load( fileName ))
+          models.Websocket.send(id,load( fileName ))
       }
-      case _ => channel.push(loadError)
+      case _ => models.Websocket.send(id,loadError)
     }
   }
 
-  def browserCommandHandling(message: JsValue, command: String, channel: PushEnumerator[JsValue]) = {
+  def browserCommandHandling(message: JsValue, command: String, id: String) = {
 
   }
 
   def terminalCommandHandling(message: JsValue, command: String,
-    channel: PushEnumerator[JsValue], terminal: models.Terminal) = {
+    id: String, terminal: models.Terminal) = {
     
     command match {
       case "keyEvent" => {
         val cmd = (message \ "value").as[Int] 
         terminal.handleKey(cmd.toByte)
       }
-      case _ => channel.push(loadError)
+      case _ => models.Websocket.send(id, loadError)
     }
   }
 

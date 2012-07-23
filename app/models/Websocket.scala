@@ -21,6 +21,10 @@ object Websocket {
     roomActor
   }
 
+  def send(id:String, text:JsValue) = {
+    default ! Send(id, text);
+  }
+  
   def join(id:String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     (default ? Join(id)).asPromise.map {
 
@@ -85,8 +89,12 @@ class Websocket extends Actor {
     }
 
     case Talk(id, text) => {
-      Communication.commandHandling(text, members.getOrElse(id, null),
+      Communication.commandHandling(text, id,
         terminals.getOrElse(id, null))
+    }
+    
+    case Send(id, text) => {
+      members.getOrElse(id, null).push(text);
     }
 
     case Quit(id) => {
@@ -105,6 +113,7 @@ class Websocket extends Actor {
 case class Join(username: String)
 case class Quit(username: String)
 case class Talk(username: String, text: JsValue)
+case class Send(username: String, text: JsValue)
 
 case class Connected(enumerator:Enumerator[JsValue])
 case class CannotConnect(msg: String)
