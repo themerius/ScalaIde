@@ -17,11 +17,18 @@ class Project(projectPath: String) {
   	
   	def libDirs = {
         val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"
+        val sbtProj = new SbtProject(projectPath)
+        if (sbtProj.isExistent)
+          (sbtProj.update).waitFor
+        else {
+          sbtProj.doBootstrap
+          (sbtProj.update).waitFor
+        }
         val userLibs = projectPath + "/lib_managed"
                 
         var allLibs = scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r )
         
-        for(file <- scanFiles(new File(userLibs), "^[^.].*[.](jar)$".r ))
+        for (file <- scanFiles(new File(userLibs), "^[^.].*[.](jar)$".r ))
           allLibs = allLibs :+ file
           
         (allLibs)
