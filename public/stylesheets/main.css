@@ -1,34 +1,131 @@
+body, html {
+  height: 100%;
+}
+
 body {
-    overflow: hidden;
+  overflow: hidden;
+  background: none repeat scroll 0 0 #F8F8FF;
+  color: #2a3a48;
+  font: 13px "Lucida Grande", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialised;
+  -webkit-user-select: none;
+}
+
+body  > header {
+  box-sizing: border-box;
+  padding: 10px;
+  position:relative;
+  margin-bottom:10px;
+  z-index: 9;
+  background: #445868;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#445868), to(#2a3a48));
+  background-image: -moz-linear-gradient(top, #445868, #2a3a48);
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(0, 0, 0, 0.8);
+}
+
+header #left{
+	display:inline;
+	float:left;
+}
+
+header #right{
+	right: 10px;
+	text-align:right;
+}
+
+header #right span{
+	color: #F8F8FF;
+	margin-left: 30px;
+}
+
+header #right span.username{
+	color: #FFEFD5;
+	font-weight: bold;
+}
+
+#logo {
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: -2px;
+  text-shadow: 1px 1px 0 #000;
+}
+#logo span {
+  color: #5daad5;
+}
+
+header #logout{
+	background: -moz-linear-gradient(center top , rgba(187, 255, 255, 0.2), rgba(187, 255, 255, 0)) repeat scroll 0 0 #2A3A48;
+	border: 1px solid #192937;
+	border-radius: 3px 3px 3px 3px;
+	box-shadow: 0 1px 4px rgba(255, 255, 255, 0.4), 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+	color: #C7D1D8;
+	cursor: pointer;
+	font-size: 100%;
+	padding: 2px 5px;
+	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.3);
+	width: 45px;
+	margin-left:20px;
+	margin-right:20px;
+	text-decoration:none;
 }
 
 #editorTabs { 
-    margin-top: 5px;
+    margin-top: 7px;
     position: absolute;
-    top: 0;
+    top: 45px;
     left: 300px;
     right: 0;
-    height:33px;
+    height:30px;
 }
 
 #editor { 
     margin: 0;
     position: absolute;
-    top: 0px;
-    bottom: 200px;
+    top: 40px;
+    bottom: 290px;
     left: 300px;
     right: 0;
-    
+    border-top: 5px solid #DDDDDD;
+    border-bottom: 5px solid #DDDDDD;
 }
 
-#terminal {
+#terminalSectionTabs { 
+    height: 20px;
+    color: #f8f8ff;
+    background: none repeat scroll 0 0 #f8f8ff;
+}
+
+#terminalSectionTabs .tab{
+	background-color: #9F9F9F;
+  border: 1px solid #2C2828;
+  height: 10px;
+  margin-right: 0;
+  padding: 2px 5px;
+}
+
+#terminalSectionTabs .open{
+  background-color: #2C2828;
+}
+
+#terminalSectionContent {
     background-color: #2C2828;
-    bottom: 0;
-    height: 200px;
-    left: 300px;
-    position: absolute;
-    right: 0px;
-    color: #8F938F;
+    height: 260px;
+    overflow: auto;
+}
+
+#terminalSection{
+	  bottom: 0;
+	  left: 300px;
+	  right: 0;
+	  position:absolute;
+	  height: 280px;
+}
+
+#terminal{
+	 background-color: #2C2828;
+	 color: #8F938F;
 }
 
 #terminal-input {
@@ -36,18 +133,43 @@ body {
 }
 
 #terminal textarea{
-    background: none repeat scroll 0 0 transparent;
-    border: medium none;
-    height: 200px;
-    resize: none;
-    width: 100%;
-    color: #8F938F;
-	
+  background: none repeat scroll 0 0 transparent;
+  border: medium none;
+  height: 150px;
+  resize: none;
+  width: 100%;
+  color: #8F938F;
+}
+
+#problems ul{
+	color: #f8f8ff;
+	list-style-type: none;
+	font-size: 12px;
+	padding: 10px 5px;
+}
+
+#problems li{
+  border-bottom: 1px solid #9F9F9F;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+#problems li:hover{
+	background-color: #9F9F9F;
+	cursor: pointer;
 }
 
 #browser{
 	font-family: Verdana;
 	font-size: 12px;
+	background: none repeat scroll 0 0 #F8F8FF;
+	overflow: auto;
+  padding-left:5px;
+  width:295px;
+  float:left;
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
 }
 
 #browser.jstree-classic .jstree-clicked {
@@ -61,6 +183,20 @@ body {
 	font-size: 11px;
 }
 
+#browser span.errorFile{
+  background: url("../images/error.gif") no-repeat 0 0px;
+  height: 20px;
+  margin-left: 17px;
+  margin-top: 4px;
+  position: absolute;
+  width: 20px;
+}
+
+.ace-eclipse .ace_gutter-cell{
+	text-align:right;
+	padding-right: 6px;
+}
+
 .ace_scroller, .ace_gutter {
   padding-top: 3px;
 }
@@ -68,8 +204,9 @@ body {
 .tab{
   background-color: #eee;
   border: 1px solid #ddd;
+  border-radius: 5px 5px 0px 0px;
   font-family: Verdana;
-  font-size: 11px;
+  font-size: 12px;
   height: 15px;
   margin: 5px 3px 0 0;
   padding: 5px 3px;
@@ -77,6 +214,7 @@ body {
   text-align: center;
   vertical-align: middle;
   width: 100px;
+  cursor: pointer;
 }
 
 .open{
@@ -84,7 +222,7 @@ body {
 }
 
 .tab a{
-  background-image: url("../images/close.gif");
+  background-image: url("../images/close.png");
   background-repeat: no-repeat;
   height: 10px;
   position: relative;
@@ -92,4 +230,74 @@ body {
   top: 0;
   width: 10px;
   margin-left: 5px;
+}
+
+.tab a:hover{
+  background-image: url("../images/close-dark.png");
+}
+
+
+
+#auto-complete-widget {
+  display: none;
+  position: absolute;
+  overflow: auto;
+  z-index: 10;
+  background: #ffffff;
+  border: 1px solid #444444;
+  padding: 0;
+  font-size: 0.7em;
+  font-family: Verdana;
+}
+
+#auto-complete-widget  ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  float: left;
+}
+    
+#auto-complete-widget ul li {
+  cursor: pointer;
+  padding: 3px 3px 3px 20px;
+  display: block;
+  float: left;
+  clear: both;
+}
+
+#auto-complete-widget ul li:hover {
+	background-color: #eeeeee;
+}
+
+#auto-complete-widget ul li.method {
+  background: url(../images/method.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.constructor {
+  background: url(../images/constructor.png) no-repeat 3px 3px;
+}
+
+#auto-complete-widget ul li.class {
+  background: url(../images/constructor.png) no-repeat 3px 3px;
+}
+
+#auto-complete-widget ul li.value {
+  background: url(../images/value.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.object {
+  background: url(../images/object.png) no-repeat 3px 3px;
+}
+
+#auto-complete-widget ul li.trait {
+  background: url(../images/trait.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.package {
+	padding-left:23px;
+  background: url(../images/package.png) no-repeat 5px 5px;
+}
+
+#auto-complete-widget ul li.selected{
+  background-color: #eeeeee;
 }

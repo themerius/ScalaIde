@@ -1,9 +1,27 @@
-@(title: String, root: java.io.File, id: String)(implicit request: RequestHeader)
+@(title: String, root: java.io.File, id: String, user: String)(implicit request: RequestHeader)
 
-@import header._
+@import header.main._
 @import includes._
 
 @main(title) {
+
+  @header.main.javascripts()
+  @header.main.stylesheets()
+
+  <header>
+      <div id="left">
+        <a href="@routes.Application.index" id="logo"><span>Scala</span>IDE</a>
+      </div>
+      <div id="right">
+        <span class="username">@user</span>
+        <span>Theme: </span>
+        <select name="theme" id="theme-changer">
+          <option value="eclipse">Eclipse</option>
+          <option value="pastel_on_dark">Dark</option>
+        </select>
+        <a id="logout" href="@routes.Authentication.logout">Logout</a>
+      </div>
+  </header>
     
   @includes.browser(root)
 
@@ -18,6 +36,9 @@
       IDE.htwg.websocket = new IDE.htwg.Websocket(jQuery);
       IDE.htwg.websocket._websocket = window.webSocket;
       IDE.htwg.websocket._websocket.onmessage = IDE.htwg.websocket.receiveEvent;
+      
+      IDE.htwg.error = new IDE.htwg.Error(jQuery);
+      IDE.htwg.completer = new IDE.htwg.Completer(jQuery);
     });
   </script>
 }

@@ -6,26 +6,23 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.iteratee._
 import play.api.libs.concurrent._
-import models.Websocket
+
+import models._
+import views._
+
 import scala.util.Random
 
 
-object Application extends Controller {
+object Application extends Controller with Secured {
 
-  def index = Action { implicit request =>
-    
-    // TODO Random needs to be replaced with some sort of session id.
-  	var random = new Random().nextInt().toString()
-  	println(random)
-  	
-    Ok(views.html.index("Ace Editor", new File("projectspace"), random))
+  def index = IsAuthenticated { username => implicit request =>
+    User.findByEmail(username).map { user =>
+    Communication.project = new Project("projectspaces/" + user.path)
+    Ok(html.index("ScalaIDE", new File("projectspaces/" + user.path), user.id + "", user.name)) 
+    }.getOrElse(Forbidden)
   }
-
-  
-  def webSocket(id:String) = WebSocket.async[JsValue] { request  =>
-  	
-    models.Terminal.start
     
+  def webSocket(id:String) = WebSocket.async[JsValue] { request  =>
     Websocket.join(id)
   }
 }
