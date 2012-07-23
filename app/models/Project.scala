@@ -5,7 +5,6 @@ import scala.collection.JavaConversions._
 import PresentationCompiler.SourceFile
 import java.io.{File => JFile}
 import play.api.Play
-import scala.sys.process._
 
 
 class Project(projectPath: String) {   
@@ -83,6 +82,14 @@ class Project(projectPath: String) {
 
 
 class SbtProject(val path: String) {
+
+  val sbtPath = {
+    if (System.getProperty("os.name").startsWith("Windows"))
+      Play.current.configuration.getString("sbt.windows.path").get
+    else
+      "sbt"
+  }
+
   def isExistent: Boolean = (new File(path + "/build.sbt")).exists
 
   def buildSbtContent: String = {
@@ -109,7 +116,7 @@ class SbtProject(val path: String) {
 
   def update = {
     val program = new java.util.ArrayList[String]()
-    program.add("sbt")
+    program.add(this.sbtPath)
     program.add("update")  // Argument
     val javaProcess = new java.lang.ProcessBuilder(program)
     javaProcess.directory(new File(path))
