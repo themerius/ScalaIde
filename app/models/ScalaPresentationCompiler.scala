@@ -23,12 +23,6 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     // existing compiler or create a new one?
     val settings = new Settings()
     settings.classpath.value = jars.map(_.getAbsolutePath).mkString("", sep, "")
-
-    // TODO: What does this do?
-    /*
-    settings.sourcepath.value = {
-      List(appRoot).mkString("", sep, "")
-    }*/
     
     val global = new Global(settings, reporter)
     
@@ -40,45 +34,28 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   loadSources(srcs)
   
   override def loadSources(srcFiles: Seq[SourceFile]) = {
-  	
-    val (updated, deleted) = updateSources(srcFiles)
-    
-    // Remove the source files that have been deleted
-    deleted.map(src => {
-      // TODO: Should I instead call askFilesDeleted?
-      compiler.removeUnitOf(toSourceFile(src))
-    })
-        
-    val deleteList = deleted.map(toSourceFile(_)).toList
+    try {
+      val (updated, deleted) = updateSources(srcFiles)
+      
+      // Remove the source files that have been deleted
+      deleted.map(src => {
+        // TODO: Should I instead call askFilesDeleted?
+        compiler.removeUnitOf(toSourceFile(src))
+      })
+          
+      val deleteList = deleted.map(toSourceFile(_)).toList
 
-    // Reload the source files that need to be updated
-    val srcList = updated.map(toSourceFile(_)).toList
-    
-    val reloadResult = new Response[Unit]
-    
-    /*compiler.askFilesDeleted(deleted.map(src => toSourceFile(src)).toList, reloadResult)
-    
-    
-    reloadResult.get(300) orElse { throw new Exception("askFilesDeleted") }  
-    
-    
-    
-    compiler.askReload(srcList, reloadResult)
-    
-    for (source <- srcList) {
-    	val response = new Response[compiler.Tree]
-      compiler.askLoadedTyped(source, response)
+      // Reload the source files that need to be updated
+      val srcList = updated.map(toSourceFile(_)).toList
+      
+      val reloadResult = new Response[Unit]
+           
+      compiler.askReload(srcList, reloadResult) 
+      reloadResult.get
+      
+    } catch {
+        case x => println(x)
     }
-    reloadResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }     
-
-    */
-  	
-  	compiler.askReload(srcList, reloadResult)
-   
-    reloadResult.get(500) orElse { throw new Exception("askRunLoadedTyped") }
-  	
-  	//How to wait for reloadResult finished? while( !reloadResult.isCompleted ).. does not work!
-    //Thread.sleep(500)
   }
   
   
@@ -93,73 +70,71 @@ class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
   	//compiler.askType(file, false, typedResult)
     compiler.askLoadedTyped(file, typedResult)
     
-    typedResult.get(500) orElse{ throw new Exception("askRunLoadedTyped") }
-  	
-  	//How to wait for reloadResult finished? while( !reloadResult.isCompleted ).. does not work!
-    Thread.sleep(500)
-  	
+    typedResult.get
   	reporter.problems
   }
   
   override def complete(src: SourceFile, line: Int, column: Int): Seq[CompleteOption] = {
-    val sourceFile = toSourceFile(src)
-    val completeResult = new Response[List[compiler.Member]]
-    val typedResult = new Response[compiler.Tree]
-    
-    // We have to ask type before asking for type completion
-    // TODO: Do I need to ask type on entire file or is it better to ask type
-    // against the sub-tree containing the position?
-    compiler.askType(sourceFile, false, typedResult)
-    typedResult.get
-    compiler.askTypeCompletion(sourceFile.position(line, column), completeResult);
-    
-    val options = completeResult.get match {
-      case Left(optionList) => optionList
-        //.filter(_.getClass.equals(classOf[compiler.TypeMember]))
-        //.filter(_.sym.decodedName.matches("^[a-zA-Z_].*"))
-        .map(option => {
-          //println(option)
-          val typeMember = option.asInstanceOf[compiler.TypeMember]
-          /*
-          println(typeMember.sym)
-          println(typeMember.tpe)
-          println(typeMember.asInstanceOf[compiler.TypeMember])
-          println(typeMember.accessible)
-          println(typeMember.inherited)
-          println(typeMember.viaView)
-          println("=====================")
-          println(option.sym)
-          println(option.sym.kindString)
-          println(option.sym.simpleName)
-          println(option.sym.fullName)
-          println(option.sym.encodedName)
-          println(option.sym.decodedName)
-          println(option.sym.infoString(option.tpe))
-          println(option.sym.infosString)
-          println("=====================")
-          */
-          
-          // TODO: How do I do this using pattern matching?
-          var replaceText = option.sym.decodedName.toString
-          var cursorPos = replaceText.length
-          if(option.tpe.isInstanceOf[compiler.MethodType]) {
-            val methodType = option.tpe.asInstanceOf[compiler.MethodType]
-            if(methodType.params.nonEmpty) {
-              replaceText += "()"
-              cursorPos = replaceText.length - 1
+    try {
+      val sourceFile = toSourceFile(src)
+      val completeResult = new Response[List[compiler.Member]]
+      val typedResult = new Response[compiler.Tree]
+      
+      // We have to ask type before asking for type completion
+      // TODO: Do I need to ask type on entire file or is it better to ask type
+      // against the sub-tree containing the position?
+      compiler.askType(sourceFile, false, typedResult)
+      typedResult.get
+      compiler.askTypeCompletion(sourceFile.position(line, column), completeResult);
+      
+      val options = completeResult.get match {
+        case Left(optionList) => optionList
+          //.filter(_.getClass.equals(classOf[compiler.TypeMember]))
+          //.filter(_.sym.decodedName.matches("^[a-zA-Z_].*"))
+          .map(option => {
+            //println(option)
+            val typeMember = option.asInstanceOf[compiler.TypeMember]
+            /*
+            println(typeMember.sym)
+            println(typeMember.tpe)
+            println(typeMember.asInstanceOf[compiler.TypeMember])
+            println(typeMember.accessible)
+            println(typeMember.inherited)
+            println(typeMember.viaView)
+            println("=====================")
+            println(option.sym)
+            println(option.sym.kindString)
+            println(option.sym.simpleName)
+            println(option.sym.fullName)
+            println(option.sym.encodedName)
+            println(option.sym.decodedName)
+            println(option.sym.infoString(option.tpe))
+            println(option.sym.infosString)
+            println("=====================")
+            */
+            
+            // TODO: How do I do this using pattern matching?
+            var replaceText = option.sym.decodedName.toString
+            var cursorPos = replaceText.length
+            if(option.tpe.isInstanceOf[compiler.MethodType]) {
+              val methodType = option.tpe.asInstanceOf[compiler.MethodType]
+              if(methodType.params.nonEmpty) {
+                replaceText += "()"
+                cursorPos = replaceText.length - 1
+              }
             }
-          }
-          
-          CompleteOption(option.sym.kindString, option.sym.decodedName.toString, option.sym.fullName,
-              replaceText, cursorPos, option.sym.infoString(option.tpe))
-          
-        }).sortWith((o1, o2) => (o1.name < o2.name))
-      case _ => List[CompleteOption]()
+            
+            CompleteOption(option.sym.kindString, option.sym.decodedName.toString, option.sym.fullName,
+                replaceText, cursorPos, option.sym.infoString(option.tpe))
+            
+          }).sortWith((o1, o2) => (o1.name < o2.name))
+        case _ => List[CompleteOption]()
+      }
+      options.toSeq
+    } catch {
+      case x => println(x.toString); Seq()
     }
-    
-    options.toSeq
   }
-  
   
   class PresentationReporter extends Reporter {
   	  	

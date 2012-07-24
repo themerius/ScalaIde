@@ -90,11 +90,10 @@ IDE.htwg.Completer = function($){
     }
     
    // var options = JSON.parse(data.options);
-    
     if(!data ||
        data.row != currentPos.row ||
        data.column != currentPos.column-1 ||
-       data.options.length == 0
+       data.options.length == 2
     ) {
       this.close();
       return;
