@@ -74,18 +74,7 @@ IDE.htwg.Editor = function($){
       "file": that._fileName,
       "value": window.aceEditor.getSession().getValue()
     };
-    
-    // If the dot was just pressed, check for auto-complete
-    if ( ctrlKey && keyCode === 32 ){
-      var currentPos = window.aceEditor.getCursorPosition();
-      var doc = window.aceEditor.getSession().getDocument();
-      {
-        msg["command"] = "save-and-complete";
-        msg["row"] = currentPos.row;
-        msg["column"] = currentPos.column - 1;
-      }
-    }
-    
+       
     // If the dot was just pressed, check for auto-complete
     if ( keyCode === 190 ){
       var currentPos = window.aceEditor.getCursorPosition();
@@ -252,9 +241,7 @@ IDE.htwg.Editor = function($){
     IDE.htwg.error.showAllProblems();  
     IDE.htwg.error.setErrorFileIcons(data.report);
     
-    if ( this._fileName != data.filename ){
-      return;
-    }
+
     
     IDE.htwg.error.setErrors(data.report);    
   };

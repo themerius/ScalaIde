@@ -21,12 +21,13 @@ object Websocket {
     roomActor
   }
 
-  def send(id:String, text:JsValue) = {
-    default ! Send(id, text);
+  def send(id:String, msg: JsValue) = { 
+    default ! Send(id, msg)
   }
   
-  def join(id:String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
-    (default ? Join(id)).asPromise.map {
+  
+  def join(id:String, projectPath: String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
+    (default ? Join(id,projectPath)).asPromise.map {
 
       case Connected(enumerator) => {
 
@@ -61,7 +62,8 @@ class Websocket extends Actor {
 
   def receive = {
 
-    case Join(id) => {
+    case Join(id, path) => {
+       
       // Create an Enumerator to write to this socket
       val channel =  Enumerator.imperative[JsValue]()
       val terminal = new models.Terminal
@@ -82,19 +84,18 @@ class Websocket extends Actor {
           "command" -> JsString("load"),
           "text" -> JsString("Happy Coding!"))
         ).as[JsValue]
-
-        Thread.sleep(50)
-        channel.push(msg)
+        
+        Websocket.send(id, msg)
+        Project.join(id, "projectspaces/" + path)
       }
     }
 
-    case Talk(id, text) => {
-      Communication.commandHandling(text, id,
-        terminals.getOrElse(id, null))
+    case Send(id, text) => {
+      members.getOrElse(id, null).push(text)
     }
     
-    case Send(id, text) => {
-      members.getOrElse(id, null).push(text);
+    case Talk(id, text) => {
+      Communication.commandHandling(text, terminals.getOrElse(id, null), id)
     }
 
     case Quit(id) => {
@@ -104,13 +105,15 @@ class Websocket extends Actor {
       terminals.getOrElse(id, null).close
       terminals = terminals - id
 
+      Project.leave(id)
+      
       println(id + " disconnected!")
       System.gc()
     }
   }
 }
 
-case class Join(username: String)
+case class Join(username: String, projectpath: String)
 case class Quit(username: String)
 case class Talk(username: String, text: JsValue)
 case class Send(username: String, text: JsValue)
