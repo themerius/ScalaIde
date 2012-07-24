@@ -10,7 +10,9 @@ import play.api.libs.iteratee._
 
 import play.api.libs.concurrent._
 
-
+/** Handles incoming communication from websocket (messages from user.)
+  * Arranges the messages to the right classes/methods for processing.
+  */
 object Communication {
   
   def recursiveListFiles(f: File): Array[File] = {

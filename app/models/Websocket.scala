@@ -12,6 +12,7 @@ import play.api.Play.current
 import akka.util.Timeout
 import akka.pattern.ask
 
+/** Factory for creating a [[models.Websocket]] actor. */
 object Websocket {
   implicit val timeout = Timeout(1 second)
 
@@ -25,10 +26,10 @@ object Websocket {
     default ! Send(id, msg)
   }
   
-  
+  /** Create a websocket for every joining visitor/user, send initial message. */
   def join(id:String, projectPath: String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     (default ? Join(id,projectPath)).asPromise.map {
-
+      
       case Connected(enumerator) => {
 
         // Create an Iteratee to consume the feed
@@ -55,11 +56,17 @@ object Websocket {
   }
 }
 
+/** Websocket actor to manage incoming messages (from the user)
+  * from the websocket. */
 class Websocket extends Actor {
 
   var members = Map.empty[String, PushEnumerator[JsValue]]
   var terminals = Map.empty[String, models.Terminal]
 
+  /** Actor receive actor-message.
+    * Join: create new websocket and terminal (new user joins),
+    * Talk: pass received message to Communication object,
+    * Quit: destroy websocket and terminal (user quits). */
   def receive = {
 
     case Join(id, path) => {
@@ -68,7 +75,8 @@ class Websocket extends Actor {
       val channel =  Enumerator.imperative[JsValue]()
       val terminal = new models.Terminal
       terminal.setWebsocket(channel)
-      terminal.start(id)
+      terminal.deactivateIfPublic(id)
+      terminal.start
       
       if(members.contains(id)) {
         sender ! CannotConnect("This username is already used")
@@ -117,6 +125,5 @@ case class Join(username: String, projectpath: String)
 case class Quit(username: String)
 case class Talk(username: String, text: JsValue)
 case class Send(username: String, text: JsValue)
-
 case class Connected(enumerator:Enumerator[JsValue])
 case class CannotConnect(msg: String)

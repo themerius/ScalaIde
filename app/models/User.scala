@@ -8,6 +8,7 @@ import anorm.SqlParser._
 
 case class User(id: Long, email: String, name: String, password: String, path: String, public: Boolean)
 
+/** Binding between the (local) database and our interface. */
 object User {
   
   // -- Parsers

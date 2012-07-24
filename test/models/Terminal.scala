@@ -13,6 +13,9 @@ object WebsocketMock extends Mockito {
 
 class ExpectScriptSpec extends Specification {
 
+  if (System.getProperty("os.name").startsWith("Windows"))
+    skipAll
+
   val ec = new ExpectScript
 
   "The 'generateStr' method" should {
@@ -73,7 +76,6 @@ class TerminalSpec extends Specification {
         terminal.deactivated must_== false
     }
   }
-
 
 }
 

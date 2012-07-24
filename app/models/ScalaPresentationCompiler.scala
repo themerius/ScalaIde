@@ -8,7 +8,12 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.util.{BatchSourceFile, SourceFile => NSCSourceFile}
 import PresentationCompiler._
 
-
+/** Compiler for scala source files and support for jar files (classpath.)
+  *
+  * @constructor create a new compiler with srcs and jars.
+  * @param srcs list of files with scala source code "project files".
+  * @param jars list of jar files for external dependencies/libraries.
+  */
 class ScalaPresentationCompiler(val srcs: Seq[SourceFile], val jars: Seq[JFile])
     extends PresentationCompiler {
   

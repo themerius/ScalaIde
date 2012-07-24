@@ -7,7 +7,7 @@ import java.io.{File => JFile}
 import scala.tools.nsc.interactive.{Global, Response}
 import scala.tools.nsc.Settings
 
-
+/** Rich interface for compiler classes */
 trait PresentationCompiler {
   import PresentationCompiler._
   
