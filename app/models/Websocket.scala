@@ -12,6 +12,7 @@ import play.api.Play.current
 import akka.util.Timeout
 import akka.pattern.ask
 
+/** Factory for creating a [[models.Websocket]] actor. */
 object Websocket {
   implicit val timeout = Timeout(1 second)
 
@@ -21,6 +22,7 @@ object Websocket {
     roomActor
   }
 
+  /** Create a websocket for every joining visitor/user, send initial message. */
   def join(id:String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
     (default ? Join(id)).asPromise.map {
 
@@ -50,11 +52,17 @@ object Websocket {
   }
 }
 
+/** Websocket actor to manage incoming messages (from the user)
+  * from the websocket. */
 class Websocket extends Actor {
 
   var members = Map.empty[String, PushEnumerator[JsValue]]
   var terminals = Map.empty[String, models.Terminal]
 
+  /** Actor receive actor-message.
+    * Join: create new websocket and terminal (new user joins),
+    * Talk: pass received message to Communication object,
+    * Quit: destroy websocket and terminal (user quits). */
   def receive = {
 
     case Join(id) => {

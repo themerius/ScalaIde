@@ -6,7 +6,11 @@ import PresentationCompiler.SourceFile
 import java.io.{File => JFile}
 import play.api.Play
 
-
+/** A project which scans the project path for jar's and initiates compiling.
+  *
+  * @constructor create a new project with projectPath.
+  * @param projectPath the absolut unix or windows path to the project dir.
+  */
 class Project(projectPath: String) {   
 
   val root = new File(projectPath)
@@ -87,7 +91,11 @@ class Project(projectPath: String) {
     
 }
 
-
+/** Make projects to sbt projects and let sbt update the project (fetch jars).
+  *
+  * @constructor create a new SbtProject with path.
+  * @param path the absolut unix or windows path to the project dir.
+  */
 class SbtProject(val path: String) {
 
   val sbtPath = {

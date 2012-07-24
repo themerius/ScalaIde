@@ -15,6 +15,9 @@ trait ICommunication {
   var out: PushEnumerator[JsValue]
 }
 
+/** Handles incoming communication from websocket (messages from user.)
+  * Arranges the messages to the right classes/methods for processing.
+  */
 object Communication extends ICommunication {
 
   override var project: Project = _

@@ -12,7 +12,9 @@ import views._
 
 import scala.util.Random
 
-
+/** Main application.
+  * Init user, his websocket and his project; builds the html-pages.
+  */
 object Application extends Controller with Secured {
 
   def index = IsAuthenticated { username => implicit request =>

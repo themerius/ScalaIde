@@ -8,6 +8,7 @@ import play.api.data.Forms._
 import models._
 import views._
 
+/** Authentificates the user, provides the login form. */
 object Authentication extends Controller {
 
   // -- Authentication

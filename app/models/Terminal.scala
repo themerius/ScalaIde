@@ -6,6 +6,8 @@ import java.io.{OutputStreamWriter, FileOutputStream}
 import play.api.libs.iteratee._
 import play.api.libs.json._
 
+/** UNIX only: builds a `except` temporary script
+  * with the ability to connect via ssh. */
 class ExpectScript {
 
   var filename: String = _
@@ -37,7 +39,12 @@ interact""".format(user, url, user, url, passw)
   def delFile = ("rm " + this.filename).!
 }
 
-// Cake Pattern for dependency injection
+/** UNIX only: establishes a ssh connection and lets the user communicate with.
+  * Listens on stadard-out and standard-in and sends every character via
+  * websocket to the users frontend.
+  * If the user types something, the characters are received via websocket
+  * and sended to standard-in.
+  * Automatically deactivates if MS Windows is used (on server-side). */
 class Terminal {
 
   var input: java.io.OutputStream = _
