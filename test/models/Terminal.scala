@@ -52,7 +52,9 @@ interact"""
 }
 
 class TerminalSpec extends Specification {
-
+  if (System.getProperty("os.name").startsWith("Windows"))
+    skipAll
+    
   val terminal = new Terminal
   terminal.setWebsocket(WebsocketMock.m)
 
