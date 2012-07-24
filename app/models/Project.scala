@@ -30,6 +30,7 @@ class CompileRobot (projectPath:String, project:ActorRef) {
   }
 }
 
+/** Factory for creating a [[models.Project]] actor. */
 object Project {   
 
   var users = Map.empty[String, Tuple2[ActorRef, CompileRobot]]
@@ -93,6 +94,12 @@ object Project {
     
 }
 
+/** A project which scans the project path for jar's and initiates compiling.
+  *
+  * @constructor create a new project with projectPath.
+  * @param id the unique user id.
+  * @param projectPath the absolut unix or windows path to the project dir.
+  */
 class Project(id: String, projectPath: String) extends Actor {
   def srcDirs = Seq(new File(projectPath))
       
@@ -112,11 +119,18 @@ class Project(id: String, projectPath: String) extends Actor {
     
     def libDirs = {
         val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"
+        val sbtProj = new SbtProject(projectPath)
+        if (sbtProj.isExistent)
+          (sbtProj.update).waitFor
+        else {
+          sbtProj.doBootstrap
+          (sbtProj.update).waitFor
+        }
         val userLibs = projectPath + "/lib_managed"
                 
         var allLibs = scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r )
         
-        for(file <- scanFiles(new File(userLibs), "^[^.].*[.](jar)$".r ))
+        for (file <- scanFiles(new File(userLibs), "^[^.].*[.](jar)$".r ))
           allLibs = allLibs :+ file
           
         (allLibs)
@@ -314,3 +328,50 @@ case class Compile(filePath: String)
 case class CompileAll()
 case class Complete(filePath: String, line: Int, column: Int)
 
+/** Make projects to sbt projects and let sbt update the project (fetch jars).
+  *
+  * @constructor create a new SbtProject with path.
+  * @param path the absolut unix or windows path to the project dir.
+  */
+class SbtProject(val path: String) {
+
+  val sbtPath = {
+    if (System.getProperty("os.name").startsWith("Windows"))
+      Play.current.configuration.getString("sbt.windows.path").get
+    else
+      "sbt"
+  }
+
+  def isExistent: Boolean = (new File(path + "/build.sbt")).exists
+
+  def buildSbtContent: String = {
+    "name := \"ScalaIde Default Project\"\n\n" +
+    "version := \"0.1\"\n\n" +
+    "scalaVersion := \"2.9.1\"\n\n" +
+    "libraryDependencies += \"org.specs2\" %%" +
+      "\"specs2\" % \"1.11\" % \"test\"\n\n" +
+    "retrieveManaged := true"
+  }
+
+  def doBootstrap: Boolean = {
+    val file = new java.io.BufferedWriter(
+      new java.io.FileWriter(path + "/build.sbt")
+    )
+    try {
+      file.write(buildSbtContent)
+      file.close()
+      return true
+    } catch {
+      case e: Exception => return false
+    }
+  }
+
+  def update = {
+    val program = new java.util.ArrayList[String]()
+    program.add(this.sbtPath)
+    program.add("update")  // Argument
+    val javaProcess = new java.lang.ProcessBuilder(program)
+    javaProcess.directory(new File(path))
+    javaProcess.start()
+  }
+}

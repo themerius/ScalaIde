@@ -5,7 +5,10 @@ import java.io.{OutputStreamWriter, FileOutputStream}
 
 import play.api.libs.iteratee._
 import play.api.libs.json._
+import play.api.Play
 
+/** UNIX only: builds a `except` temporary script
+  * with the ability to connect via ssh. */
 class ExpectScript {
 
   var filename: String = _
@@ -37,39 +40,39 @@ interact""".format(user, url, user, url, passw)
   def delFile = ("rm " + this.filename).!
 }
 
-// Cake Pattern for dependency injection
+/** UNIX only: establishes a ssh connection and lets the user communicate with.
+  * Listens on stadard-out and standard-in and sends every character via
+  * websocket to the users frontend.
+  * If the user types something, the characters are received via websocket
+  * and sended to standard-in.
+  * Automatically deactivates if MS Windows is used (on server-side). */
 class Terminal {
 
   var input: java.io.OutputStream = _
   var websocket: PushEnumerator[JsValue] = _
   var deactivated = true
+  var publicUser = false
 
-  def start(id: String) = {
-  
-    User.findById(id).map { user =>
-      if (System.getProperty("os.name").startsWith("Windows")) {
-        deactivated = true
+  def start = {
+    if (!Play.current.configuration.getBoolean("terminal.support").get) {
+      deactivated = true
 
-        println("This feature only available on unix.")
-        sendToWebsocket("This feature only available on unix.")
-      } else if (user.public) {
-        deactivated = true
+      println("This feature only available on unix.")
+      sendToWebsocket("This feature only available on unix.")
+    } else if (publicUser) {
+      println("This feature is only available for certain user.")
+      sendToWebsocket("This feature is only available for certain user.")
+    } else {
+      deactivated = false
 
-        println("This feature is only available for certain user.")
-        sendToWebsocket("This feature is only available for certain user.")
-      
-      } else {
-        deactivated = false
+      val expectScript = new ExpectScript
+      expectScript.generateStr("terminal", "141.37.31.235", "")
+      val scriptPath = expectScript.createFile
 
-        val expectScript = new ExpectScript
-        expectScript.generateStr("terminal", "141.37.31.235", "")
-        val scriptPath = expectScript.createFile
+      val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
+      ("expect -f " + scriptPath).run(pio)
 
-        val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
-        ("expect -f " + scriptPath).run(pio)
-
-        expectScript.delFile
-      }
+      expectScript.delFile
     }
   }
 
@@ -77,6 +80,16 @@ class Terminal {
     //this.handleKey("4".toByte)
     if (!deactivated)
       this.input.close()
+  }
+
+  def deactivateIfPublic(userId: String) = {
+    User.findById(userId).map { user =>
+      if (user.public) {
+        publicUser = true
+      } else {
+        publicUser = false
+      }
+    }
   }
 
   def stdin(in: java.io.OutputStream) = {
