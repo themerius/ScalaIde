@@ -22,7 +22,7 @@ class CompileRobot (projectPath:String, project:ActorRef) {
       2 seconds,
       2 seconds,
       project,
-      CompileAll
+      CompileAll()
     )
     
   def stop() {
