@@ -54,7 +54,7 @@ object Communication {
         Project.complete( id, fileName, row, column )
       }
       case "compile" => {
-        //Project.compile( id, fileName )
+        Project.compile( id, fileName )
       }
       case "create" => {
         val folder = (msg \ "folder").as[Boolean]
