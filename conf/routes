@@ -10,7 +10,7 @@ GET     /login                              controllers.Authentication.login
 POST    /login                              controllers.Authentication.authenticate
 GET     /logout                             controllers.Authentication.logout
 
-GET     /webSocket/                 controllers.Application.webSocket(id)
+GET     /webSocket/                 controllers.Application.webSocket(id, projectPath)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

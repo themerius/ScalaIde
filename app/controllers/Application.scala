@@ -17,12 +17,11 @@ object Application extends Controller with Secured {
 
   def index = IsAuthenticated { username => implicit request =>
     User.findByEmail(username).map { user =>
-    Communication.project = new Project("projectspaces/" + user.path)
-    Ok(html.index("ScalaIDE", new File("projectspaces/" + user.path), user.id + "", user.name)) 
+    Ok(html.index("ScalaIDE", new File("projectspaces/" + user.path), user.id + "", user.name, user.path)) 
     }.getOrElse(Forbidden)
   }
     
-  def webSocket(id:String) = WebSocket.async[JsValue] { request  =>
-    Websocket.join(id)
+  def webSocket(id:String, projectPath:String) = WebSocket.async[JsValue] { request  =>
+    Websocket.join(id, projectPath)
   }
 }
