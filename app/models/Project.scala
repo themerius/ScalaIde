@@ -22,7 +22,7 @@ class CompileRobot (projectPath:String, project:ActorRef) {
       2 seconds,
       2 seconds,
       project,
-      CompileAll()
+      CompileAll
     )
     
   def stop() {
@@ -42,7 +42,6 @@ object Project {
     val tuple = (actor, compileRobot)
     
     users = users + (id -> tuple)
-    
   }
   
    def leave(id:String) {
@@ -121,11 +120,12 @@ class Project(id: String, projectPath: String) extends Actor {
         val playLibs = Play.current.configuration.getString("framework.directory").get + "/framework/sbt"
         val sbtProj = new SbtProject(projectPath)
         if (sbtProj.isExistent)
-          (sbtProj.update).waitFor
+         (sbtProj.update).waitFor
         else {
           sbtProj.doBootstrap
           (sbtProj.update).waitFor
         }
+        
         val userLibs = projectPath + "/lib_managed"
                 
         var allLibs = scanFiles(new File(playLibs), "^[^.].*[.](jar)$".r )
@@ -341,7 +341,7 @@ class SbtProject(val path: String) {
     else
       "sbt"
   }
-
+  
   def isExistent: Boolean = (new File(path + "/build.sbt")).exists
 
   def buildSbtContent: String = {
