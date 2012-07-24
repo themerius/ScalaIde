@@ -20,8 +20,8 @@ class ExpectScriptSpec extends Specification {
 
   "The 'generateStr' method" should {
     "generate a valid expect script" in {
-        val result = ec.generateStr("user", "example.tdl", "users_password")
-        result must_== """#!/usr/bin/expect -f
+      val result = ec.generateStr("user", "example.tdl", "users_password")
+      result must_== """#!/usr/bin/expect -f
 
 spawn ssh user@example.tdl
 expect "user@example.tdl's password:"
@@ -32,20 +32,20 @@ interact"""
 
   "The 'createFile' method" should {
     "create a file in /tmp" in {
-        val filename = ec.createFile
-        filename must startWith("/tmp/ScalaIde")
-        ("ls /tmp").!!.contains(filename.split("/tmp/")(1)) must beTrue
+      val filename = ec.createFile
+      filename must startWith("/tmp/ScalaIde")
+      ("ls /tmp").!!.contains(filename.split("/tmp/")(1)) must beTrue
     }
     "and save the filename in itself" in {
-        ec.filename must startWith("/tmp/ScalaIde")
+      ec.filename must startWith("/tmp/ScalaIde")
     }
   }
 
   "The 'delFile' method" should {
     "delete the file generated from 'createFile'" in {
-        val filename = ec.filename
-        ec.delFile
-        ("ls /tmp").!!.contains(filename.split("/tmp/")(1)) must beFalse
+      val filename = ec.filename
+      ec.delFile
+      ("ls /tmp").!!.contains(filename.split("/tmp/")(1)) must beFalse
     }
   }
 
