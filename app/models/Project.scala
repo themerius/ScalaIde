@@ -19,8 +19,8 @@ import java.io.{OutputStreamWriter, FileOutputStream, File}
 class CompileRobot (projectPath:String, project:ActorRef) {
   
   val scheduler = Akka.system.scheduler.schedule(
-      2 seconds,
-      2 seconds,
+      500 milliseconds,
+      500 milliseconds,
       project,
       CompileAll()
     )
@@ -75,7 +75,7 @@ object Project {
   def rename(id: String, fileName: String, newFileName: String) = {
     users.getOrElse(id,null)._1 ! Rename(fileName, newFileName) 
   }  
-  
+ 
   //update the compiler with new or removed files
   def update(id: String) = {
     users.getOrElse(id,null)._1 ! Update() 
@@ -100,6 +100,8 @@ object Project {
   * @param projectPath the absolut unix or windows path to the project dir.
   */
 class Project(id: String, projectPath: String) extends Actor {
+  var compiledJSON : JsValue = _
+  
   def srcDirs = Seq(new File(projectPath))
       
   def sourceFiles = {
@@ -239,9 +241,7 @@ class Project(id: String, projectPath: String) extends Actor {
     }
     
     case Compile(filePath) =>{
-      try {
-        println("Compiling!")
-        
+      try {        
         def getType(severity: Int) = severity match {
           case 1 => "warning"
           case 2 => "error"
@@ -260,14 +260,19 @@ class Project(id: String, projectPath: String) extends Actor {
           "\"type\":\"" + getType(prob.severity) + "\"" +
           "}"
         }).mkString("[", ",", "]") 
-        
-        Websocket.send(id, 
-          JsObject(Seq(
+         
+        val compiledJSONnew = JsObject(Seq(
             "type" -> JsString("editor"),
             "command" -> JsString("compile"),
             "filename" -> JsString(filePath),
             "report" -> JsString(probMessages))
-            ).as[JsValue])
+            ).as[JsValue]
+            
+        if (compiledJSON != compiledJSONnew) {
+           Websocket.send(id, compiledJSONnew)
+           compiledJSON = compiledJSONnew
+           println("New compiled data sent!")
+        }
       } catch {
         case x => println ("Error in compile! " + x)
       }
