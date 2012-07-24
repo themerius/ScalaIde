@@ -5,6 +5,7 @@ import java.io.{OutputStreamWriter, FileOutputStream}
 
 import play.api.libs.iteratee._
 import play.api.libs.json._
+import play.api.Play
 
 /** UNIX only: builds a `except` temporary script
   * with the ability to connect via ssh. */
@@ -53,7 +54,7 @@ class Terminal {
   var publicUser = false
 
   def start = {
-    if (System.getProperty("os.name").startsWith("Windows")) {
+    if (!Play.current.configuration.getBoolean("terminal.support").get) {
       deactivated = true
 
       println("This feature only available on unix.")
