@@ -302,14 +302,18 @@ IDE.htwg.Browser = function($){
 
   this.getRelativePathOfObject = function(obj){
 
-    var indexOfLastSlash = obj.attr("title").lastIndexOf("/");
+    // NO IDEA WHY WE NEED THIS, DOESNT WORK AT ALL SINCE WE ENABLED RELAITVE PATHS
+    // var indexOfLastSlash = obj.attr("title").lastIndexOf("/");
+    // alert(obj.attr("title"))
         
     //we are root or folder
-    if (indexOfLastSlash < 0 || obj.attr("rel") === "folder" ){
-      return obj.attr("title");
-    }
+    //if (indexOfLastSlash < 0 || obj.attr("rel") === "folder" ){
+    //  return obj.attr("title");
+    //}
     
-    return obj.attr("title").substring(0, indexOfLastSlash);
+    //return obj.attr("title").substring(0, indexOfLastSlash);
+    
+    return obj.attr("title");
   };
   
   this.initialize();
