@@ -34,14 +34,14 @@ IDE.htwg.Terminal = function($){
     var msg = {
       "type": "terminal",
       "command": "keyEvent",
-      "value": e.keyCode
+      "value": e.charCode
     };
     IDE.htwg.websocket.sendMessage(msg);
   };
 
   this.handleKeyDown = function(e) {
     var key = e.keyCode;
-    if (key == 8 || key == 9) {  // Backspace || Tabulator
+    if (key == 8 || key == 9 || key == 13) {  // Backspace || Tabulator || Enter
       var msg = {
         "type": "terminal",
         "command": "keyEvent",
