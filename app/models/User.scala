@@ -23,7 +23,7 @@ object User {
     get[String]("user.password") ~
     get[String]("user.projectpath") ~
     get[String]("user.shhlogin") map {
-      case id~email~name~password~path~sshlogin => User(id, email, name, password, path, shhlogin)
+      case id~email~name~password~path~sshlogin => User(id, email, name, password, path, sshlogin)
     }
   }
   
