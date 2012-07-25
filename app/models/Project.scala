@@ -149,7 +149,7 @@ class Project(id: String, projectPath: String) extends Actor {
   // or not.
   //
   def scanFiles(dir: File, regex: scala.util.matching.Regex, recurse: (File) => Boolean = {_=>true}): Seq[File] = {
-    if(dir.isDirectory && recurse(dir)) {
+    if(dir.canRead && dir.isDirectory && recurse(dir)) {
         dir.listFiles.toSeq.collect({
             case f if f.isFile && regex.unapplySeq(f.getName).isDefined => Seq(f)
             case f if f.isDirectory => scanFiles(f, regex)

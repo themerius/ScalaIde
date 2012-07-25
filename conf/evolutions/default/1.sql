@@ -7,7 +7,7 @@ CREATE TABLE User (
     email varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     fullname varchar(255) NOT NULL,
-    public boolean NOT NULL,
+    sshlogin varchar(255)  DEFAULT '',
     projectpath varchar(255) NOT NULL,
     PRIMARY KEY (id)
 );
