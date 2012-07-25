@@ -101,9 +101,7 @@ object Project {
   */
 class Project(id: String, projectPath: String) extends Actor {
   var compiledJSON : JsValue = _
-  var fileName : String = _
-  var fileNameCompiled : Boolean = false
-  
+
   def srcDirs = Seq(new File(projectPath))
       
   def sourceFiles = {
@@ -195,9 +193,7 @@ class Project(id: String, projectPath: String) extends Actor {
     }
     
     case Save(fileName, content) => {
-      try {
-         this.fileNameCompiled = false
-      
+      try {      
         val out = new OutputStreamWriter(
           new FileOutputStream(fileName), "UTF-8")
         out.write(content)
@@ -246,39 +242,36 @@ class Project(id: String, projectPath: String) extends Actor {
     
     case Compile(filePath) =>{
       try {        
-        if (!fileNameCompiled) {
-          fileNameCompiled = !fileNameCompiled
-          def getType(severity: Int) = severity match {
-            case 1 => "warning"
-            case 2 => "error"
-            case _ => "ignore"
-          }
+        def getType(severity: Int) = severity match {
+          case 1 => "warning"
+          case 2 => "error"
+          case _ => "ignore"
+        }
 
-          var probMessages = { 
-              compiler.loadSources(sourceFiles)
-              sourceFileMap.get(new File(filePath)).map(compiler.compile).getOrElse(Seq())
-            }.map(prob => {
-            "{" +
-            "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
-            "\"row\":" + prob.pos.line + "," +
-            "\"column\":" + prob.pos.column + "," +
-            "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
-            "\"type\":\"" + getType(prob.severity) + "\"" +
-            "}"
-          }).mkString("[", ",", "]") 
-           
-          val compiledJSONnew = JsObject(Seq(
-              "type" -> JsString("editor"),
-              "command" -> JsString("compile"),
-              "filename" -> JsString(filePath),
-              "report" -> JsString(probMessages))
-              ).as[JsValue]
-              
-          if (compiledJSON != compiledJSONnew) {
-             Websocket.send(id, compiledJSONnew)
-             compiledJSON = compiledJSONnew
-             println("New compiled data sent!")
-          }
+        var probMessages = { 
+            compiler.loadSources(sourceFiles)
+            sourceFileMap.get(new File(filePath)).map(compiler.compile).getOrElse(Seq())
+          }.map(prob => {
+          "{" +
+          "\"source\":\"" + prob.pos.source.replace("\\", "/") + "\"," +
+          "\"row\":" + prob.pos.line + "," +
+          "\"column\":" + prob.pos.column + "," +
+          "\"text\":\"" + prob.msg.replace("\"", "\\\"").replace("\n", "") + "\"," +
+          "\"type\":\"" + getType(prob.severity) + "\"" +
+          "}"
+        }).mkString("[", ",", "]") 
+         
+        val compiledJSONnew = JsObject(Seq(
+            "type" -> JsString("editor"),
+            "command" -> JsString("compile"),
+            "filename" -> JsString(filePath),
+            "report" -> JsString(probMessages))
+            ).as[JsValue]
+            
+        if (compiledJSON != compiledJSONnew) {
+           Websocket.send(id, compiledJSONnew)
+           compiledJSON = compiledJSONnew
+           println("New compiled data sent!")
         }
       } catch {
         case x => println ("Error in compile! " + x)
