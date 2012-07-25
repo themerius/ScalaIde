@@ -19,7 +19,7 @@ object Application extends Controller with Secured {
 
   def index = IsAuthenticated { username => implicit request =>
     User.findByEmail(username).map { user =>
-    Ok(html.index("ScalaIDE", new File("projectspaces/" + user.path), user.id + "", user.name, user.path)) 
+    Ok(html.index("ScalaIDE", new File(user.path + ""), user.id + "", user.name, user.path)) 
     }.getOrElse(Forbidden)
   }
     

@@ -94,7 +94,7 @@ class Websocket extends Actor {
         ).as[JsValue]
         
         Websocket.send(id, msg)
-        Project.join(id, "projectspaces/" + path)
+        Project.join(id, path)
       }
     }
 
