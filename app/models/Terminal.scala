@@ -54,7 +54,7 @@ class Terminal {
   var sshIp = ""
   var sshPwd = ""
   var deactivated = true
-  var publicUser = false
+  var publicUser = false  // public users have a disabled terminal
 
   def start = {
     if (!Play.current.configuration.getBoolean("terminal.support").get) {
@@ -87,7 +87,7 @@ class Terminal {
 
   def deactivateIfPublic(userId: String) = {
     User.findById(userId).map { user =>
-      if (user.public) {
+      if (user.sshlogin == "") {
         publicUser = true
       } else {
         publicUser = false
