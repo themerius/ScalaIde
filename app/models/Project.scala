@@ -19,8 +19,8 @@ import java.io.{OutputStreamWriter, FileOutputStream, File}
 class CompileRobot (projectPath:String, project:ActorRef) {
   
   val scheduler = Akka.system.scheduler.schedule(
-      500 milliseconds,
-      500 milliseconds,
+      1500 milliseconds,
+      1500 milliseconds,
       project,
       CompileAll()
     )
