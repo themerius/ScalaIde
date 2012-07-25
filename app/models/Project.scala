@@ -267,8 +267,7 @@ class Project(id: String, projectPath: String) extends Actor {
             "report" -> JsString(probMessages))
             ).as[JsValue]
             
-           Websocket.send(id, compiledJSONnew)
-        }
+         Websocket.send(id, compiledJSONnew)
       } catch {
         case x => println ("Error in compile! " + x)
       }
