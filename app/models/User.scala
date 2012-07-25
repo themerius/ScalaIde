@@ -22,8 +22,8 @@ object User {
     get[String]("user.fullname") ~
     get[String]("user.password") ~
     get[String]("user.projectpath") ~
-    get[String]("user.shhlogin") map {
-      case id~email~name~password~path~sshlogin => User(id, email, name, password, path, shhlogin)
+    get[String]("user.sshlogin") map {
+      case id~email~name~password~path~sshlogin => User(id, email, name, password, path, sshlogin)
     }
   }
   
