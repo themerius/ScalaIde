@@ -75,6 +75,7 @@ class Websocket extends Actor {
       val channel =  Enumerator.imperative[JsValue]()
       val terminal = new models.Terminal
       terminal.setWebsocket(channel)
+      terminal.deactivateIfPublic(id)
       if (!terminal.publicUser)
         terminal.getSshLoginData(id)
       terminal.start
