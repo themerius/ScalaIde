@@ -117,9 +117,12 @@ class Terminal {
 
   def getSshLoginData(userId: String) = {
     User.findById(userId).map { user =>
-      this.sshUser = user.sshlogin.split("@")(0)
-      this.sshIp = user.sshlogin.split("@")(1)
-      this.sshPwd = user.password
+      val sshlogin = user.sshlogin.split("@")
+      if (sshlogin.length == 2) {
+        this.sshUser = sshlogin(0)
+        this.sshIp = sshlogin(1)
+        this.sshPwd = user.password
+      }
     }
   }
 
