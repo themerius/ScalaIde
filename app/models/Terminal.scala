@@ -50,6 +50,9 @@ class Terminal {
 
   var input: java.io.OutputStream = _
   var websocket: PushEnumerator[JsValue] = _
+  var sshUser = ""
+  var sshIp = ""
+  var sshPwd = ""
   var deactivated = true
   var publicUser = false
 
@@ -66,7 +69,7 @@ class Terminal {
       deactivated = false
 
       val expectScript = new ExpectScript
-      expectScript.generateStr("terminal", "141.37.31.235", "")
+      expectScript.generateStr(this.sshUser, sshIp, sshPwd)
       val scriptPath = expectScript.createFile
 
       val pio = new ProcessIO(this.stdin, this.stdout, this.stderr)
@@ -110,6 +113,14 @@ class Terminal {
 
   def setWebsocket(ws: PushEnumerator[JsValue]) {
     this.websocket = ws
+  }
+
+  def getSshLoginData(userId: String) = {
+    User.findById(userId).map { user =>
+      this.sshUser = user.email.split("@")(0)
+      this.sshIp = user.email.split("@")(1)
+      this.sshPwd = user.password
+    }
   }
 
   def sendToWebsocket(output: String) = this.synchronized {
