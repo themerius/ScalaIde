@@ -117,8 +117,8 @@ class Terminal {
 
   def getSshLoginData(userId: String) = {
     User.findById(userId).map { user =>
-      this.sshUser = user.email.split("@")(0)
-      this.sshIp = user.email.split("@")(1)
+      this.sshUser = user.sshlogin.split("@")(0)
+      this.sshIp = user.sshlogin.split("@")(1)
       this.sshPwd = user.password
     }
   }
