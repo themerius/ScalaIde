@@ -19,8 +19,8 @@ import java.io.{OutputStreamWriter, FileOutputStream, File}
 class CompileRobot (projectPath:String, project:ActorRef) {
   
   val scheduler = Akka.system.scheduler.schedule(
-      1 seconds,
-      750 milliseconds,
+      1500 milliseconds,
+      1500 milliseconds,
       project,
       CompileAll()
     )
@@ -90,7 +90,6 @@ object Project {
   def complete(id: String, filePath: String, line: Int, column: Int) = {
     users.getOrElse(id,null)._1 ! Complete(filePath, line, column)
   }
-    
 }
 
 /** A project which scans the project path for jar's and initiates compiling.
