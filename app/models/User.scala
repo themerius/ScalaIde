@@ -6,7 +6,7 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-case class User(id: Long, email: String, name: String, password: String, path: String, public: Boolean)
+case class User(id: Long, email: String, name: String, password: String, path: String, sshlogin: String)
 
 /** Binding between the (local) database and our interface. */
 object User {
@@ -22,8 +22,8 @@ object User {
     get[String]("user.fullname") ~
     get[String]("user.password") ~
     get[String]("user.projectpath") ~
-    get[Boolean] ("user.public") map {
-      case id~email~name~password~path~public => User(id, email, name, password, path, public)
+    get[String]("user.shhlogin") map {
+      case id~email~name~password~path~sshlogin => User(id, email, name, password, path, shhlogin)
     }
   }
   
