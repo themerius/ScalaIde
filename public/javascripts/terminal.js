@@ -54,8 +54,9 @@ IDE.htwg.Terminal = function($){
   this.executeCommand = function(data){
     switch ( data.command ){
       case "response":
-        responses = responses + data.value + '\n'
-        $("#terminal-input").val(responses)
+        responses = responses + data.value + '\n';
+        $("#terminal-input").val(responses);
+        $("#terminal-input").scrollTop($("#terminal-input")[0].scrollHeight); // Fixing firefox scrollbar
         break;
       default:break;
     }
