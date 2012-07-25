@@ -267,10 +267,7 @@ class Project(id: String, projectPath: String) extends Actor {
             "report" -> JsString(probMessages))
             ).as[JsValue]
             
-        if (compiledJSON != compiledJSONnew) {
            Websocket.send(id, compiledJSONnew)
-           compiledJSON = compiledJSONnew
-           println("New compiled data sent!")
         }
       } catch {
         case x => println ("Error in compile! " + x)
