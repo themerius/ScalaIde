@@ -15,7 +15,7 @@ INSERT INTO USER (email, password, fullname, public, projectpath)
 VALUES('public@test.de', '123', 'Public', 1, 'projectspaces/public');
 
 INSERT INTO USER (email, password, fullname, public, projectpath)
-VALUES('absolut@test.de', '123', 'AboluteUser', 0, 'home/terminal');
+VALUES('absolut@test.de', '123', 'AboluteUser', 0, '/home/terminal');
  
 # --- !Downs
  
