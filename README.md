@@ -8,6 +8,10 @@ Thanks to [Dirk](https://github.com/dirkmc/ph), he had previously implemented th
 
 ![ScalaIde Screenshot](https://lh3.googleusercontent.com/-WKTbRBZ009k/T98xE8BcA-I/AAAAAAAAAHY/bWuPr5fQxjE/s800/scalaide.png)
 
+ScalaIde with a bigger Project opened:
+
+![ScalaIde Screenshot bigger Project](https://lh4.googleusercontent.com/-xD0TbYWRNcw/UHAXc0w0fMI/AAAAAAAAAIU/LVTjYQsUT8w/s720/scalaide.jpg)
+
 **Features**:
 
   * Multiple users
