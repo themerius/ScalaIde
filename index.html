@@ -29,13 +29,17 @@
       <section>
         <h1>ScalaIde</h1>
 
-<p>Is a web-based IDE for the Scala Language. For the frontend html5 is used, especially websockets in the backend the play framework is used, which is implemented in Scala.</p>
+<p>Is a web-based IDE for the Scala Language. For the frontend html5 is used with especially websockets; in the backend the play framework is used, which is implemented in Scala.</p>
 
 <p>It is originated as a teamproject at the department of computer science at <a href="http://www.htwg-konstanz.de/">University of Applied Sciences, Constance, Germany</a>.</p>
 
-<p>Thanks to <a href="https://github.com/dirkmc/ph">Dirk</a>, he had previously implemented the compiler-thing. We ported it to Play 2.0.</p>
+<p>Thanks to <a href="https://github.com/dirkmc/ph">Dirk</a>, he had previously implemented the compiler-binding. We ported it to Play 2.0.</p>
 
 <p><img src="https://lh3.googleusercontent.com/-WKTbRBZ009k/T98xE8BcA-I/AAAAAAAAAHY/bWuPr5fQxjE/s800/scalaide.png" alt="ScalaIde Screenshot"></p>
+
+<p>ScalaIde with a bigger Project opened:</p>
+
+<p><img src="https://lh4.googleusercontent.com/-xD0TbYWRNcw/UHAXc0w0fMI/AAAAAAAAAIU/LVTjYQsUT8w/s720/scalaide.jpg" alt="ScalaIde Screenshot bigger Project"></p>
 
 <p><strong>Features</strong>:</p>
 
@@ -46,6 +50,11 @@
 <li>File tree</li>
 <li>Editor</li>
 <li>Terminal-Shell (ssh connection)</li>
+</ul><p><strong>Browser Support (Tested on)</strong>:</p>
+
+<ul>
+<li>Firefox 13.0.1 (Windows)</li>
+<li>Safari 5.1.7 (Mac OS X)</li>
 </ul><p><strong>Used technologies</strong>:</p>
 
 <ul>
@@ -95,9 +104,41 @@ ln -s $HOME/play-2.0.1/play bin/play
 
 <p>Click something here and click something there…</p>
 
+<h2>Configuration</h2>
+
+<h3>Basic Configuration (without terminal support)</h3>
+
+<p>If you want to run ScalaIde on <em>Windows</em> there is <strong>no terminal support</strong> yet and on <em>UNIX</em> if you disable the terminal, you can save much configuration effort.</p>
+
+<p>In <code>conf/application.conf</code> set the flag <code>terminal.support=true</code> if you want to <em>enable</em> terminal support, else let the default value <code>terminal.support=false</code>.</p>
+
+<p>Via default a <code>projectspaces</code> folder is created, where every user has his own folder (relative path in <code>conf/evolutions/2.sql</code> file) with source code files and maybe additional jar-files fetched automatically via <code>sbt update</code> at user login. Therefore the <strong>login may take some seconds!</strong></p>
+
+<p>If you want run the server on Windows you must provide in <code>conf/application.conf</code> the path to the bat-file, which stats sbt. Change this flag: <code>sbt.windows.path="C:/path/to/sbt.bat"</code>.</p>
+
+<p>To compile code the scala compiler is needed in form of jar-files. The play framework delivers this. In <code>conf/application.conf</code> you must set a flag to the main folder of your downloaded play installation: <code>framework.directory="/path/to/play-2.0"</code>. In this example the play-executable would be in /path/to/play-2.0/play.</p>
+
+<h3>Advanced Configuration</h3>
+
+<p>If you want terminal support, there may be more configuration effort. Especially terminal support is only on <strong>UNIX</strong> (like Debian, Mac OS X) available yet.</p>
+
+<p>If you enable the terminal (set in <code>conf/application.conf</code> the flag <code>terminal.support=true</code>, default ist <code>false</code>) we <em>assume</em>, you have a real operating-system user for every user in the database. The OS-user must be available via ssh. Users email is also ssh loginname and users password is also the ssh password. (Users marked as public have <em>never</em> terminal access/support.)
+Further we assume the home of the user is his project path, and only one project per user is allowed yet!
+Set an absolute path (path to the user's home) and set the flag, that's an absolute path is set.</p>
+
+<p>You can set the users in <code>conf/evolutions/2.sql</code>.</p>
+
+<p>Because of the OS-useres you have more configuration, with groups and rights. Example: One OS-user (the master user) starts the ScalaIde and the client user can login through the Ide and have their own scope and can not kill the ScalaIde-Server. But the master user must have access (read, write) to the client user files!</p>
+
 <h2>Run It</h2>
 
-<p>Change in <code>conf/application.conf</code> the variable <code>framework.directory</code> to the play-main-folder.</p>
+<p>Reminder: Change in <code>conf/application.conf</code></p>
+
+<ul>
+<li>the variable <code>framework.directory</code> to the play-main-folder,</li>
+<li>windows users must set <code>sbt.windows.path</code>,</li>
+<li>if you want terminal support set <code>terminal.support</code> -&gt; more configuration effort!</li>
+</ul><p>Lets begin, type in your shell:</p>
 
 <pre><code>git clone git://github.com/themerius/ScalaIde.git
 cd ScalaIde
@@ -115,7 +156,9 @@ play run
 <a href="mailto:sven@test.de">sven@test.de</a>, password = 123</li>
 <li>
 <a href="mailto:simon@test.de">simon@test.de</a>, password = 123</li>
-</ul><p>If you want to create the database direcly, call play like this:</p>
+<li>
+<a href="mailto:public@test.de">public@test.de</a>, password = 123</li>
+</ul><p>If you want to create the database direcly, instead of <code>play run</code>, call play like this:</p>
 
 <pre><code>play -DapplyEvolutions.default=true start
 </code></pre>
@@ -125,16 +168,18 @@ play run
 <pre><code>play h2-browser run
 </code></pre>
 
-<h2>Work to do</h2>
+<h2>Limits</h2>
 
-<p>There is also work to do...</p>
+<ul>
+<li>One project per user</li>
+</ul>
       </section>
     </div>
     <footer>
       <p>Project maintained by <a href="https://github.com/themerius">themerius</a></p>
       <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
     </footer>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
